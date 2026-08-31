@@ -1,0 +1,28 @@
+## Build
+bin/
+obj/
+out/
+
+## Visual Studio / Rider
+.vs/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## SQLite
+*.db
+*.db-shm
+*.db-wal
+
+## OS
+.DS_Store
+Thumbs.db
+
+## Logs
+*.log
+
+## Environment
+.env
+.env.*
