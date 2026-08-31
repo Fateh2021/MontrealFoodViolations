@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Montreal Food Violations</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --card: #fff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --primary: #1d4ed8;
+      --primary-soft: #dbeafe;
+      --secondary: #f8fafc;
+      --shadow: rgba(15, 23, 42, 0.08);
+      --danger: #dc2626;
+      --success: #15803d;
+      --warning-bg: #fffbeb;
+      --warning-border: #fde68a;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 1500px;
+      margin: 32px auto;
+      padding: 20px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 24px;
+      box-shadow: 0 8px 22px var(--shadow);
+      margin-bottom: 20px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 18px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: clamp(1.8rem, 2vw, 2.4rem);
+    }
+
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      max-width: 720px;
+      font-size: 0.95rem;
+    }
+
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: var(--primary-soft);
+      color: var(--primary);
+      font-size: 0.8rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .meta-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .meta-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      background: var(--secondary);
+      border: 1px solid var(--border);
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+
+    .meta-item strong {
+      color: var(--text);
+    }
+
+    .meta-item.success strong { color: var(--success); }
+    .meta-item.error strong { color: var(--danger); }
+
+    .stats-section {
+      margin-bottom: 20px;
+    }
+
+    .stats-section h2 {
+      margin: 0 0 12px;
+      font-size: 1.05rem;
+    }
+
+    .stats-kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .kpi-card {
+      background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%);
+      border: 1px solid #bfdbfe;
+      border-radius: 14px;
+      padding: 16px;
+    }
+
+    .kpi-card .label {
+      display: block;
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .kpi-card .value {
+      display: block;
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--primary);
+      line-height: 1.2;
+    }
+
+    .kpi-card .hint {
+      display: block;
+      margin-top: 6px;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .stats-panels {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 14px;
+    }
+
+    .stats-panel {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 16px;
+    }
+
+    .stats-panel h3 {
+      margin: 0 0 10px;
+      font-size: 0.95rem;
+    }
+
+    .stats-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .stats-list li {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+
+    .stats-list li:last-child {
+      border-bottom: none;
+    }
+
+    .stats-list strong {
+      color: var(--text);
+      text-align: right;
+    }
+
+    .amount-cell {
+      font-weight: 700;
+      color: #0f766e;
+      white-space: nowrap;
+    }
+
+    .link-btn {
+      background: none;
+      border: none;
+      padding: 0;
+      color: var(--primary);
+      font-weight: 700;
+      cursor: pointer;
+      text-align: left;
+      width: auto;
+    }
+
+    .link-btn:hover {
+      text-decoration: underline;
+      transform: none;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 1000;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal {
+      width: min(960px, 100%);
+      max-height: 90vh;
+      overflow: auto;
+      background: white;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.2);
+      padding: 24px;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .modal-header h2 {
+      margin: 0 0 8px;
+    }
+
+    .modal-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .modal-close {
+      width: auto;
+      min-width: 42px;
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: white;
+    }
+
+    .modal-table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+
+    .modal-table-wrap table {
+      min-width: 760px;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .info-block {
+      background: var(--secondary);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+    }
+
+    .info-block h2 {
+      margin: 0 0 10px;
+      font-size: 1rem;
+    }
+
+    .info-block p,
+    .info-block ul {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .info-block ul {
+      padding-left: 18px;
+    }
+
+    .info-block li + li {
+      margin-top: 6px;
+    }
+
+    .info-block a {
+      color: var(--primary);
+    }
+
+    details.legend {
+      margin-bottom: 20px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: white;
+      overflow: hidden;
+    }
+
+    details.legend summary {
+      cursor: pointer;
+      padding: 14px 16px;
+      font-weight: 700;
+      background: var(--secondary);
+      list-style: none;
+    }
+
+    details.legend summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .legend-table-wrap {
+      overflow-x: auto;
+      padding: 0 16px 16px;
+    }
+
+    .legend-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 480px;
+      font-size: 0.88rem;
+    }
+
+    .legend-table th,
+    .legend-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .legend-table th {
+      color: var(--text);
+      width: 28%;
+    }
+
+    .legend-table td {
+      color: var(--muted);
+    }
+
+    .disclaimer {
+      background: var(--warning-bg);
+      border: 1px solid var(--warning-border);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-bottom: 20px;
+      font-size: 0.88rem;
+      color: #92400e;
+    }
+
+    .disclaimer strong {
+      display: block;
+      margin-bottom: 6px;
+      color: #78350f;
+    }
+
+    .filters {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .filters.compact {
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 0.95rem;
+      background: white;
+      color: var(--text);
+    }
+
+    input:focus, select:focus {
+      outline: 2px solid rgba(29,78,216,0.15);
+      border-color: var(--primary);
+    }
+
+    button {
+      cursor: pointer;
+      font-weight: 700;
+      transition: transform 0.12s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      border: none;
+    }
+
+    .btn-secondary {
+      background: #eef2ff;
+      color: var(--primary);
+      border: 1px solid #c7d2fe;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 18px 0 10px;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .pagination {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .page-btn {
+      min-width: 42px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: white;
+      color: var(--text);
+    }
+
+    .page-btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .page-btn:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: white;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1300px;
+    }
+
+    th, td {
+      padding: 11px 12px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      vertical-align: top;
+      font-size: 0.86rem;
+      word-break: break-word;
+    }
+
+    th {
+      background: var(--secondary);
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    th button {
+      width: auto;
+      padding: 0;
+      border: none;
+      background: transparent;
+      color: var(--text);
+      font-size: 0.86rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    tr:hover {
+      background: #f8fafc;
+    }
+
+    .empty {
+      padding: 20px;
+      text-align: center;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: var(--primary-soft);
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 0.76rem;
+    }
+
+    .site-footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      padding: 8px 0 24px;
+    }
+
+    .site-footer a {
+      color: var(--primary);
+    }
+
+    @media (max-width: 720px) {
+      .container { padding: 12px; }
+      .card { padding: 16px; }
+      .topbar { align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="topbar">
+        <div>
+          <h1>Montreal Food Violations</h1>
+          <p class="subtitle">
+            Consultez les poursuites et infractions en matière de salubrité alimentaire
+            publiées par la Ville de Montréal. Recherchez un restaurant, une adresse,
+            un propriétaire ou une catégorie d'infraction.
+          </p>
+        </div>
+        <span class="badge-pill">Données ouvertes</span>
+      </div>
+
+      <div class="meta-bar">
+        <div class="meta-item">
+          <span>Infractions en base :</span>
+          <strong id="totalViolations">—</strong>
+        </div>
+        <div class="meta-item">
+          <span>Total des amendes :</span>
+          <strong id="totalFines">—</strong>
+        </div>
+        <div class="meta-item" id="syncMeta">
+          <span>Dernière sync :</span>
+          <strong id="lastSync">Chargement...</strong>
+        </div>
+        <div class="meta-item">
+          <span>Source :</span>
+          <strong><a href="https://data.montreal.ca/dataset/05a9e718-6810-4e73-8bb9-5955efeb91a0" target="_blank" rel="noopener">data.montreal.ca</a></strong>
+        </div>
+      </div>
+
+      <section class="stats-section" aria-label="Statistiques des amendes">
+        <h2>Amendes imposées (condamnations)</h2>
+        <div class="stats-kpi-grid">
+          <div class="kpi-card">
+            <span class="label">Montant total</span>
+            <span class="value" id="kpiTotalFines">—</span>
+            <span class="hint">Somme de toutes les amendes enregistrées</span>
+          </div>
+          <div class="kpi-card">
+            <span class="label">Amende moyenne</span>
+            <span class="value" id="kpiAverageFine">—</span>
+            <span class="hint">Par dossier condamné</span>
+          </div>
+          <div class="kpi-card">
+            <span class="label">Dossiers avec amende</span>
+            <span class="value" id="kpiFinesCount">—</span>
+            <span class="hint">Condamnations avec montant</span>
+          </div>
+          <div class="kpi-card">
+            <span class="label">Amende maximale</span>
+            <span class="value" id="kpiMaxFine">—</span>
+            <span class="hint">Montant le plus élevé</span>
+          </div>
+        </div>
+        <div class="stats-panels">
+          <div class="stats-panel">
+            <h3>Amendes par année (date du jugement)</h3>
+            <ul class="stats-list" id="finesByYear">
+              <li>Chargement...</li>
+            </ul>
+          </div>
+          <div class="stats-panel">
+            <h3>Top catégories par montant total</h3>
+            <ul class="stats-list" id="topCategoriesByFines">
+              <li>Chargement...</li>
+            </ul>
+          </div>
+          <div class="stats-panel">
+            <h3>Amendes par territoire</h3>
+            <ul class="stats-list" id="finesByCity">
+              <li>Chargement...</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <div class="info-grid">
+        <div class="info-block">
+          <h2>Comment chercher ?</h2>
+          <ul>
+            <li>Utilisez la <strong>recherche globale</strong> pour chercher partout en une fois.</li>
+            <li>Affinez avec les filtres (établissement, adresse, catégorie, statut, etc.).</li>
+            <li>Cliquez sur les en-têtes de colonnes pour <strong>trier</strong> les résultats.</li>
+            <li>Cliquez sur un <strong>établissement</strong> pour voir sa fiche complète.</li>
+            <li>Utilisez <strong>Exporter CSV</strong> pour télécharger les résultats filtrés.</li>
+          </ul>
+        </div>
+        <div class="info-block">
+          <h2>Pourquoi ce site ?</h2>
+          <ul>
+            <li><strong>Fiche établissement</strong> — historique complet par commerce.</li>
+            <li><strong>Export CSV</strong> — téléchargez les résultats filtrés.</li>
+            <li><strong>Statistiques d'amendes</strong> — totaux, moyennes et tendances par année.</li>
+            <li><strong>Recherche avancée</strong> — filtres combinables sur tous les champs.</li>
+            <li><strong>Données à jour</strong> — synchronisation automatique avec la Ville.</li>
+            <li><strong>API ouverte</strong> — endpoints REST pour réutiliser les données.</li>
+          </ul>
+        </div>
+        <div class="info-block">
+          <h2>Mise à jour des données</h2>
+          <p>
+            Les données sont synchronisées automatiquement environ <strong>toutes les 24 heures</strong>
+            depuis le fichier officiel de la Ville de Montréal.
+            Si aucun résultat n'apparaît au premier chargement, la synchronisation est peut-être encore en cours.
+          </p>
+        </div>
+      </div>
+
+      <details class="legend">
+        <summary>Légende des colonnes</summary>
+        <div class="legend-table-wrap">
+          <table class="legend-table">
+            <thead>
+              <tr>
+                <th>Colonne</th>
+                <th>Signification</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><th>Établissement</th><td>Nom du commerce visé par l'infraction.</td></tr>
+              <tr><th>Adresse / Ville</th><td>Lieu associé au dossier.</td></tr>
+              <tr><th>Catégorie</th><td>Type d'infraction (hygiène, température, etc.).</td></tr>
+              <tr><th>Description</th><td>Détail de la violation constatée.</td></tr>
+              <tr><th>Statut</th><td>Statut de l'établissement (Ouvert, Fermé, changement d'exploitant, etc.).</td></tr>
+              <tr><th>Date</th><td>Date de l'infraction.</td></tr>
+              <tr><th>Date jugement</th><td>Date du jugement — le montant de l'amende y est associé.</td></tr>
+              <tr><th>Montant</th><td>Amende imposée pour la condamnation (en dollars canadiens).</td></tr>
+              <tr><th>Propriétaire</th><td>Nom du propriétaire déclaré.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
+
+      <div class="disclaimer">
+        <strong>Avertissement</strong>
+        Ces informations proviennent de sources publiques officielles et sont présentées à titre indicatif uniquement.
+        La présence d'une infraction ne signifie pas nécessairement que l'établissement est dangereux aujourd'hui —
+        vérifiez toujours le <strong>statut</strong> et la <strong>date</strong> du dossier.
+        Ce site n'est pas affilié à la Ville de Montréal.
+      </div>
+
+      <div class="filters">
+        <input id="search" type="text" placeholder="Recherche globale" />
+        <input id="etablissement" type="text" placeholder="Établissement" />
+        <input id="adresse" type="text" placeholder="Adresse" />
+        <input id="categorie" type="text" placeholder="Catégorie" />
+        <input id="statut" type="text" placeholder="Statut établissement" />
+      </div>
+
+      <div class="filters compact">
+        <input id="proprietaire" type="text" placeholder="Propriétaire" />
+        <input id="description" type="text" placeholder="Description" />
+        <select id="pageSize" aria-label="Nombre de résultats">
+          <option value="10">10 résultats</option>
+          <option value="25" selected>25 résultats</option>
+          <option value="50">50 résultats</option>
+          <option value="100">100 résultats</option>
+        </select>
+        <button id="searchBtn" class="btn-primary">Rechercher</button>
+        <button id="exportBtn" class="btn-secondary" type="button">Exporter CSV</button>
+        <button id="resetBtn" class="btn-secondary" type="button">Réinitialiser</button>
+      </div>
+
+      <div class="summary-row">
+        <div id="summary">Chargement...</div>
+        <div id="pagination" class="pagination"></div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th><button type="button" data-sort="idPoursuite">ID</button></th>
+              <th><button type="button" data-sort="businessId">Business ID</button></th>
+              <th><button type="button" data-sort="etablissement">Établissement</button></th>
+              <th><button type="button" data-sort="adresse">Adresse</button></th>
+              <th><button type="button" data-sort="ville">Ville</button></th>
+              <th><button type="button" data-sort="categorie">Catégorie</button></th>
+              <th><button type="button" data-sort="statut">Statut</button></th>
+              <th><button type="button" data-sort="proprietaire">Propriétaire</button></th>
+              <th><button type="button" data-sort="date">Date</button></th>
+              <th><button type="button" data-sort="dateJugement">Date jugement</button></th>
+              <th><button type="button" data-sort="montant">Montant</button></th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody id="results"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <footer class="site-footer">
+      Données publiques — source officielle :
+      <a href="https://data.montreal.ca/dataset/05a9e718-6810-4e73-8bb9-5955efeb91a0" target="_blank" rel="noopener">Ville de Montréal — Infractions alimentaires</a>
+    </footer>
+  </div>
+
+  <div id="businessModal" class="modal-backdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="businessModalTitle">
+      <div class="modal-header">
+        <div>
+          <h2 id="businessModalTitle">Fiche établissement</h2>
+          <p id="businessModalSubtitle" class="subtitle"></p>
+        </div>
+        <button id="closeBusinessModal" class="modal-close" type="button">Fermer</button>
+      </div>
+      <div id="businessModalMeta" class="modal-meta"></div>
+      <div class="modal-table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Date jugement</th>
+              <th>Catégorie</th>
+              <th>Montant</th>
+              <th>Statut</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody id="businessModalViolations"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const summary = document.getElementById('summary');
+    const results = document.getElementById('results');
+    const pagination = document.getElementById('pagination');
+    const totalViolationsEl = document.getElementById('totalViolations');
+    const totalFinesEl = document.getElementById('totalFines');
+    const lastSyncEl = document.getElementById('lastSync');
+    const syncMetaEl = document.getElementById('syncMeta');
+    const kpiTotalFinesEl = document.getElementById('kpiTotalFines');
+    const kpiAverageFineEl = document.getElementById('kpiAverageFine');
+    const kpiFinesCountEl = document.getElementById('kpiFinesCount');
+    const kpiMaxFineEl = document.getElementById('kpiMaxFine');
+    const finesByYearEl = document.getElementById('finesByYear');
+    const topCategoriesByFinesEl = document.getElementById('topCategoriesByFines');
+    const finesByCityEl = document.getElementById('finesByCity');
+    const businessModal = document.getElementById('businessModal');
+    const businessModalTitle = document.getElementById('businessModalTitle');
+    const businessModalSubtitle = document.getElementById('businessModalSubtitle');
+    const businessModalMeta = document.getElementById('businessModalMeta');
+    const businessModalViolations = document.getElementById('businessModalViolations');
+
+    const dateFormatter = new Intl.DateTimeFormat('fr-CA', {
+      dateStyle: 'medium',
+      timeStyle: 'short'
+    });
+
+    const currencyFormatter = new Intl.NumberFormat('fr-CA', {
+      style: 'currency',
+      currency: 'CAD',
+      maximumFractionDigits: 0
+    });
+
+    const compactCurrencyFormatter = new Intl.NumberFormat('fr-CA', {
+      style: 'currency',
+      currency: 'CAD',
+      maximumFractionDigits: 2
+    });
+
+    const state = {
+      page: 1,
+      pageSize: 25,
+      sortBy: 'IdPoursuite',
+      descending: false
+    };
+
+    function formatDate(value) {
+      if (!value) return 'Jamais';
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return 'Inconnue';
+      return dateFormatter.format(date);
+    }
+
+    function formatNumber(value) {
+      return new Intl.NumberFormat('fr-CA').format(value ?? 0);
+    }
+
+    function formatCurrency(value, compact = false) {
+      if (value == null || Number.isNaN(Number(value))) return '—';
+      return (compact ? currencyFormatter : compactCurrencyFormatter).format(Number(value));
+    }
+
+    function renderStatsList(container, items, emptyMessage) {
+      container.innerHTML = '';
+      if (!items.length) {
+        container.innerHTML = `<li>${emptyMessage}</li>`;
+        return;
+      }
+
+      items.forEach(item => {
+        const li = document.createElement('li');
+        li.innerHTML = `<span>${item.label}</span><strong>${item.value}</strong>`;
+        container.appendChild(li);
+      });
+    }
+
+    function renderFinesStats(stats) {
+      const fines = stats.fines || {};
+      const totalAmount = fines.totalAmount ?? 0;
+      const count = fines.count ?? 0;
+
+      totalFinesEl.textContent = formatCurrency(totalAmount, true);
+      kpiTotalFinesEl.textContent = formatCurrency(totalAmount, true);
+      kpiAverageFineEl.textContent = formatCurrency(fines.averageAmount ?? 0);
+      kpiFinesCountEl.textContent = formatNumber(count);
+      kpiMaxFineEl.textContent = formatCurrency(fines.maxAmount ?? 0);
+
+      const yearItems = (stats.finesByYear || []).map(entry => ({
+        label: `${entry.year} (${formatNumber(entry.count)} dossiers)`,
+        value: formatCurrency(entry.totalAmount, true)
+      }));
+      renderStatsList(finesByYearEl, yearItems, 'Aucune donnée disponible.');
+
+      const categoryItems = (stats.topCategoriesByFines || []).map(entry => ({
+        label: `${entry.category || 'Sans catégorie'} (${formatNumber(entry.count)})`,
+        value: formatCurrency(entry.totalAmount, true)
+      }));
+      renderStatsList(topCategoriesByFinesEl, categoryItems, 'Aucune catégorie disponible.');
+
+      const cityItems = (stats.finesByCity || []).map(entry => ({
+        label: `${entry.city} (${formatNumber(entry.count)} dossiers)`,
+        value: formatCurrency(entry.totalAmount, true)
+      }));
+      renderStatsList(finesByCityEl, cityItems, 'Aucun territoire disponible.');
+    }
+
+    function buildExportParams() {
+      const params = new URLSearchParams({
+        sortBy: state.sortBy,
+        descending: String(state.descending)
+      });
+
+      const values = {
+        search: document.getElementById('search').value.trim(),
+        etablissement: document.getElementById('etablissement').value.trim(),
+        adresse: document.getElementById('adresse').value.trim(),
+        categorie: document.getElementById('categorie').value.trim(),
+        statut: document.getElementById('statut').value.trim(),
+        proprietaire: document.getElementById('proprietaire').value.trim(),
+        description: document.getElementById('description').value.trim()
+      };
+
+      Object.entries(values).forEach(([key, value]) => {
+        if (value) params.set(key, value);
+      });
+
+      return params;
+    }
+
+    function exportCsv() {
+      const params = buildExportParams();
+      window.location.href = `/api/violations/export?${params.toString()}`;
+    }
+
+    function closeBusinessModal() {
+      businessModal.classList.remove('open');
+      businessModal.setAttribute('aria-hidden', 'true');
+    }
+
+    async function openBusinessModal(businessId) {
+      if (!businessId) return;
+
+      businessModalTitle.textContent = 'Chargement...';
+      businessModalSubtitle.textContent = '';
+      businessModalMeta.innerHTML = '';
+      businessModalViolations.innerHTML = '<tr><td colspan="5" class="empty">Chargement...</td></tr>';
+      businessModal.classList.add('open');
+      businessModal.setAttribute('aria-hidden', 'false');
+
+      try {
+        const response = await fetch(`/api/violations/business/${businessId}`);
+        if (!response.ok) {
+          throw new Error('Impossible de charger la fiche établissement.');
+        }
+
+        const data = await response.json();
+        businessModalTitle.textContent = data.etablissement || 'Établissement';
+        businessModalSubtitle.textContent = [data.adresse, data.ville].filter(Boolean).join(', ');
+
+        businessModalMeta.innerHTML = `
+          <div class="meta-item"><span>Business ID :</span><strong>${formatNumber(data.businessId)}</strong></div>
+          <div class="meta-item"><span>Infractions :</span><strong>${formatNumber(data.violationCount)}</strong></div>
+          <div class="meta-item"><span>Total amendes :</span><strong>${formatCurrency(data.totalFines, true)}</strong></div>
+          <div class="meta-item"><span>Propriétaire :</span><strong>${data.proprietaire || '—'}</strong></div>
+          <div class="meta-item"><span>Statut :</span><strong>${data.statut || '—'}</strong></div>
+        `;
+
+        businessModalViolations.innerHTML = '';
+        (data.violations || []).forEach(violation => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${violation.dateJugement ?? ''}</td>
+            <td>${violation.categorie ?? ''}</td>
+            <td class="amount-cell">${violation.montant != null ? formatCurrency(violation.montant) : ''}</td>
+            <td>${violation.statut ?? ''}</td>
+            <td>${violation.description ?? ''}</td>
+          `;
+          businessModalViolations.appendChild(row);
+        });
+      } catch (error) {
+        businessModalTitle.textContent = 'Erreur';
+        businessModalViolations.innerHTML = `<tr><td colspan="5" class="empty">${error.message}</td></tr>`;
+      }
+    }
+
+    async function loadMeta() {
+      try {
+        const [statsResponse, syncResponse] = await Promise.all([
+          fetch('/api/violations/stats'),
+          fetch('/api/sync/status')
+        ]);
+
+        if (statsResponse.ok) {
+          const stats = await statsResponse.json();
+          totalViolationsEl.textContent = formatNumber(stats.totalViolations);
+          renderFinesStats(stats);
+        } else {
+          totalViolationsEl.textContent = '—';
+          totalFinesEl.textContent = '—';
+        }
+
+        if (syncResponse.ok) {
+          const sync = await syncResponse.json();
+          const status = (sync.status || 'Idle').toLowerCase();
+
+          if (status === 'success' && sync.lastSyncCompletedAt) {
+            lastSyncEl.textContent = formatDate(sync.lastSyncCompletedAt);
+            syncMetaEl.classList.add('success');
+          } else if (status === 'failed') {
+            lastSyncEl.textContent = 'Échec — ' + formatDate(sync.lastSyncCompletedAt);
+            syncMetaEl.classList.add('error');
+          } else if (status === 'idle') {
+            lastSyncEl.textContent = 'En attente de la première sync';
+          } else {
+            lastSyncEl.textContent = sync.status || 'Inconnu';
+          }
+        } else {
+          lastSyncEl.textContent = 'Indisponible';
+        }
+      } catch {
+        totalViolationsEl.textContent = '—';
+        totalFinesEl.textContent = '—';
+        lastSyncEl.textContent = 'Indisponible';
+        finesByYearEl.innerHTML = '<li>Indisponible</li>';
+        topCategoriesByFinesEl.innerHTML = '<li>Indisponible</li>';
+        finesByCityEl.innerHTML = '<li>Indisponible</li>';
+      }
+    }
+
+    function buildParams() {
+      const params = new URLSearchParams({
+        page: String(state.page),
+        pageSize: String(state.pageSize),
+        sortBy: state.sortBy,
+        descending: String(state.descending)
+      });
+
+      const values = {
+        search: document.getElementById('search').value.trim(),
+        etablissement: document.getElementById('etablissement').value.trim(),
+        adresse: document.getElementById('adresse').value.trim(),
+        categorie: document.getElementById('categorie').value.trim(),
+        statut: document.getElementById('statut').value.trim(),
+        proprietaire: document.getElementById('proprietaire').value.trim(),
+        description: document.getElementById('description').value.trim()
+      };
+
+      Object.entries(values).forEach(([key, value]) => {
+        if (value) params.set(key, value);
+      });
+
+      return params;
+    }
+
+    function renderPagination(totalPages) {
+      pagination.innerHTML = '';
+
+      const prev = document.createElement('button');
+      prev.type = 'button';
+      prev.textContent = 'Précédent';
+      prev.disabled = state.page <= 1;
+      prev.className = 'page-btn';
+      prev.addEventListener('click', () => {
+        if (state.page > 1) {
+          state.page -= 1;
+          search();
+        }
+      });
+      pagination.appendChild(prev);
+
+      const maxButtons = 5;
+      let startPage = Math.max(1, state.page - 2);
+      let endPage = Math.min(totalPages, startPage + maxButtons - 1);
+      if (endPage - startPage + 1 < maxButtons && startPage > 1) {
+        startPage = Math.max(1, endPage - maxButtons + 1);
+      }
+
+      for (let p = startPage; p <= endPage; p++) {
+        const pageBtn = document.createElement('button');
+        pageBtn.type = 'button';
+        pageBtn.textContent = String(p);
+        pageBtn.className = 'page-btn' + (p === state.page ? ' active' : '');
+        pageBtn.addEventListener('click', () => {
+          state.page = p;
+          search();
+        });
+        pagination.appendChild(pageBtn);
+      }
+
+      const next = document.createElement('button');
+      next.type = 'button';
+      next.textContent = 'Suivant';
+      next.disabled = state.page >= totalPages;
+      next.className = 'page-btn';
+      next.addEventListener('click', () => {
+        if (state.page < totalPages) {
+          state.page += 1;
+          search();
+        }
+      });
+      pagination.appendChild(next);
+    }
+
+    function renderEmpty(message) {
+      results.innerHTML = `<tr><td colspan="12" class="empty">${message}</td></tr>`;
+    }
+
+    async function search() {
+      summary.textContent = 'Chargement...';
+      results.innerHTML = '';
+
+      try {
+        const params = buildParams();
+        const response = await fetch(`/api/violations/search?${params.toString()}`);
+        if (!response.ok) {
+          throw new Error('Erreur de requête: ' + response.status);
+        }
+
+        const data = await response.json();
+        const items = data.items || [];
+        const totalPages = Math.max(1, Number(data.totalPages || 1));
+        const totalCount = data.totalCount || 0;
+
+        summary.textContent = `Page ${state.page} / ${totalPages} • ${formatNumber(totalCount)} résultat(s)`;
+        renderPagination(totalPages);
+
+        if (!items.length) {
+          const hasFilters = ['search', 'etablissement', 'adresse', 'categorie', 'statut', 'proprietaire', 'description']
+            .some(id => document.getElementById(id).value.trim() !== '');
+          renderEmpty(
+            totalCount === 0 && !hasFilters
+              ? 'Aucune donnée pour le moment. La synchronisation est peut-être en cours — réessayez dans quelques minutes.'
+              : 'Aucun résultat trouvé.'
+          );
+          return;
+        }
+
+        items.forEach(item => {
+          const row = document.createElement('tr');
+          const businessCell = item.businessId
+            ? `<button type="button" class="link-btn business-link" data-business-id="${item.businessId}">${item.businessId}</button>`
+            : '';
+          const establishmentCell = item.businessId
+            ? `<button type="button" class="link-btn business-link" data-business-id="${item.businessId}">${item.etablissement ?? ''}</button>`
+            : (item.etablissement ?? '');
+
+          row.innerHTML = `
+            <td><span class="badge">${item.idPoursuite ?? ''}</span></td>
+            <td>${businessCell}</td>
+            <td>${establishmentCell}</td>
+            <td>${item.adresse ?? ''}</td>
+            <td>${item.ville ?? ''}</td>
+            <td>${item.categorie ?? ''}</td>
+            <td>${item.statut ?? ''}</td>
+            <td>${item.proprietaire ?? ''}</td>
+            <td>${item.date ?? ''}</td>
+            <td>${item.dateJugement ?? ''}</td>
+            <td class="amount-cell">${item.montant != null ? formatCurrency(item.montant) : ''}</td>
+            <td>${item.description ?? ''}</td>
+          `;
+          results.appendChild(row);
+        });
+
+        results.querySelectorAll('.business-link').forEach(button => {
+          button.addEventListener('click', () => {
+            openBusinessModal(button.dataset.businessId);
+          });
+        });
+      } catch (error) {
+        summary.textContent = 'Erreur';
+        renderEmpty(error.message);
+        pagination.innerHTML = '';
+      }
+    }
+
+    function resetFilters() {
+      document.getElementById('search').value = '';
+      document.getElementById('etablissement').value = '';
+      document.getElementById('adresse').value = '';
+      document.getElementById('categorie').value = '';
+      document.getElementById('statut').value = '';
+      document.getElementById('proprietaire').value = '';
+      document.getElementById('description').value = '';
+      document.getElementById('pageSize').value = '25';
+      state.page = 1;
+      state.sortBy = 'IdPoursuite';
+      state.descending = false;
+      search();
+    }
+
+    function bindEnterHandlers() {
+      ['search', 'etablissement', 'adresse', 'categorie', 'statut', 'proprietaire', 'description'].forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+          element.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+              state.page = 1;
+              search();
+            }
+          });
+        }
+      });
+
+      document.getElementById('pageSize').addEventListener('change', () => {
+        state.pageSize = Number(document.getElementById('pageSize').value);
+        state.page = 1;
+        search();
+      });
+    }
+
+    function bindSortHandlers() {
+      document.querySelectorAll('[data-sort]').forEach(button => {
+        button.addEventListener('click', () => {
+          const sortKey = button.dataset.sort;
+          const normalized = sortKey.charAt(0).toUpperCase() + sortKey.slice(1);
+          if (state.sortBy === normalized) {
+            state.descending = !state.descending;
+          } else {
+            state.sortBy = normalized;
+            state.descending = false;
+          }
+          state.page = 1;
+          search();
+        });
+      });
+    }
+
+    document.getElementById('searchBtn').addEventListener('click', () => {
+      state.page = 1;
+      search();
+    });
+
+    document.getElementById('exportBtn').addEventListener('click', exportCsv);
+    document.getElementById('resetBtn').addEventListener('click', resetFilters);
+    document.getElementById('closeBusinessModal').addEventListener('click', closeBusinessModal);
+    businessModal.addEventListener('click', (event) => {
+      if (event.target === businessModal) {
+        closeBusinessModal();
+      }
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        closeBusinessModal();
+      }
+    });
+    bindSortHandlers();
+    bindEnterHandlers();
+    loadMeta();
+    search();
+  </script>
+</body>
+</html>
