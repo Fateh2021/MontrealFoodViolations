@@ -3,6 +3,7 @@ using MontrealFoodViolations.Application.Interfaces;
 using MontrealFoodViolations.Application.Options;
 using MontrealFoodViolations.Infrastructure.Data;
 using MontrealFoodViolations.Infrastructure.Services;
+using Swashbuckle.AspNetCore.SwaggerUI;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,7 +25,16 @@ builder.Services.AddScoped<IViolationSyncService, ViolationSyncService>();
 builder.Services.AddHostedService<ViolationSyncBackgroundService>();
 
 builder.Services.AddControllers();
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi(options =>
+{
+    options.AddDocumentTransformer((document, _, _) =>
+    {
+        document.Info.Title = "Montreal Food Violations";
+        document.Info.Version = "v1";
+        document.Info.Description = "API des infractions alimentaires de la Ville de Montréal.";
+        return Task.CompletedTask;
+    });
+});
 
 var app = builder.Build();
 
@@ -37,6 +47,10 @@ using (var scope = app.Services.CreateScope())
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/openapi/v1.json", "Montreal Food Violations v1");
+    });
 }
 
 app.UseDefaultFiles();
