@@ -1,27 +1,26 @@
 using System.Globalization;
 using System.Text;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MontrealFoodViolations.Application.Interfaces;
 using MontrealFoodViolations.Domain.Entities;
 using MontrealFoodViolations.Infrastructure.Data;
 
 namespace MontrealFoodViolations.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/violations")]
 public class ViolationsController : ControllerBase
 {
     private readonly MontrealFoodViolationsDbContext _dbContext;
-    private readonly IViolationSyncService _syncService;
 
-    public ViolationsController(MontrealFoodViolationsDbContext dbContext, IViolationSyncService syncService)
+    public ViolationsController(MontrealFoodViolationsDbContext dbContext)
     {
         _dbContext = dbContext;
-        _syncService = syncService;
     }
 
     [HttpGet]
+    [EndpointSummary("Liste paginée des infractions.")]
     public async Task<IActionResult> Get(int page = 1, int pageSize = 25, CancellationToken cancellationToken = default)
     {
         if (page < 1) page = 1;
@@ -42,6 +41,7 @@ public class ViolationsController : ControllerBase
     }
 
     [HttpGet("business/{businessId:long}")]
+    [EndpointSummary("Fiche d'un établissement et historique de ses infractions.")]
     public async Task<IActionResult> GetByBusinessId(long businessId, CancellationToken cancellationToken)
     {
         var violations = await _dbContext.Violations.AsNoTracking()
@@ -74,6 +74,7 @@ public class ViolationsController : ControllerBase
     }
 
     [HttpGet("{id:long}")]
+    [EndpointSummary("Détail d'une infraction à partir de son id_poursuite.")]
     public async Task<IActionResult> GetById(long id, CancellationToken cancellationToken)
     {
         var violation = await _dbContext.Violations.AsNoTracking().FirstOrDefaultAsync(x => x.IdPoursuite == id, cancellationToken);
@@ -82,6 +83,7 @@ public class ViolationsController : ControllerBase
     }
 
     [HttpGet("search")]
+    [EndpointSummary("Recherche filtrée, avec tri et pagination.")]
     public async Task<IActionResult> Search(
         [FromQuery] string? search,
         [FromQuery] string? etablissement,
@@ -116,6 +118,7 @@ public class ViolationsController : ControllerBase
     }
 
     [HttpGet("export")]
+    [EndpointSummary("Export CSV des résultats filtrés (5 000 lignes maximum).")]
     public async Task<IActionResult> Export(
         [FromQuery] string? search,
         [FromQuery] string? etablissement,
@@ -140,6 +143,7 @@ public class ViolationsController : ControllerBase
     }
 
     [HttpGet("stats")]
+    [EndpointSummary("Totaux et statistiques des amendes.")]
     public async Task<IActionResult> Stats(CancellationToken cancellationToken)
     {
         var total = await _dbContext.Violations.AsNoTracking().CountAsync(cancellationToken);
@@ -331,19 +335,5 @@ public class ViolationsController : ControllerBase
         }
 
         return builder.ToString();
-    }
-
-    [HttpPost("/api/sync")]
-    public async Task<IActionResult> TriggerSync(CancellationToken cancellationToken)
-    {
-        var result = await _syncService.SyncAsync(cancellationToken);
-        return Ok(result);
-    }
-
-    [HttpGet("/api/sync/status")]
-    public async Task<IActionResult> GetStatus(CancellationToken cancellationToken)
-    {
-        var status = await _syncService.GetStatusAsync(cancellationToken);
-        return Ok(status);
     }
 }

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MontrealFoodViolations.Application.Interfaces;
 
@@ -15,6 +16,7 @@ public class SyncController : ControllerBase
     }
 
     [HttpPost("sync")]
+    [EndpointSummary("Lance une synchronisation manuelle du CSV officiel.")]
     public async Task<IActionResult> TriggerSync(CancellationToken cancellationToken)
     {
         var result = await _syncService.SyncAsync(cancellationToken);
@@ -22,6 +24,7 @@ public class SyncController : ControllerBase
     }
 
     [HttpGet("sync/status")]
+    [EndpointSummary("État de la dernière synchronisation.")]
     public async Task<IActionResult> Status(CancellationToken cancellationToken)
     {
         var status = await _syncService.GetStatusAsync(cancellationToken);
