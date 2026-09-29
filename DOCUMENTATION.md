@@ -11,7 +11,7 @@ Ce document explique comment lancer le projet, utiliser l'interface web et conso
 - télécharge automatiquement le CSV officiel des infractions alimentaires de la Ville de Montréal ;
 - stocke les données dans une base **SQLite** ;
 - expose une **API REST** pour consulter, rechercher et exporter les infractions ;
-- propose une **interface web** de recherche et de statistiques.
+- propose une **interface web Vue 3** de recherche et de statistiques.
 
 **Source officielle :** https://donnees.montreal.ca/dataset/inspection-aliments-contrevenants
 
@@ -20,6 +20,7 @@ Ce document explique comment lancer le projet, utiliser l'interface web et conso
 ## Prérequis
 
 - .NET SDK 10.x
+- Node.js (seulement pour modifier l'interface Vue 3)
 - Connexion Internet (synchronisation initiale)
 
 ```bash
@@ -37,7 +38,19 @@ dotnet run --project src/MontrealFoodViolations.Api/MontrealFoodViolations.Api.c
 
 Interface web : **http://localhost:5067**
 
+Swagger (développement) : **http://localhost:5067/swagger**
+
 Au démarrage, les migrations EF Core sont appliquées automatiquement et une synchronisation des données est lancée en arrière-plan.
+
+L'interface est une application **Vue 3** (Composition API) dans `frontend/`. Le build de production est servi par l'API depuis `wwwroot`. Pour modifier l'UI :
+
+```bash
+cd frontend
+npm install
+npm run build
+```
+
+En développement UI uniquement : lancer l'API, puis `npm run dev` dans `frontend/` (Vite proxifie `/api` vers `http://localhost:5067`). Node.js n'est pas requis pour simplement exécuter le projet.
 
 ---
 
@@ -113,8 +126,9 @@ dotnet test MontrealFoodViolations.sln
 ## Architecture
 
 ```
+frontend/                                 # Interface Vue 3 (Vite)
 src/
-├── MontrealFoodViolations.Api/           # API REST + interface web
+├── MontrealFoodViolations.Api/           # API REST + wwwroot (build Vue)
 ├── MontrealFoodViolations.Application/   # Interfaces, modèles, options
 ├── MontrealFoodViolations.Domain/        # Entités métier
 └── MontrealFoodViolations.Infrastructure/ # EF Core, sync, parsing CSV

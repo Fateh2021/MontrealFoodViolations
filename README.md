@@ -1,22 +1,24 @@
 # MontrealFoodViolations
 
-MontrealFoodViolations is a .NET 10 ASP.NET Core Web API that automatically downloads, parses, and synchronizes the public Montreal food safety violations dataset into SQLite.
+MontrealFoodViolations est une application full-stack .NET 10 : une API ASP.NET Core qui télécharge, analyse et synchronise le jeu de données public des infractions alimentaires de Montréal dans SQLite, plus une interface Vue 3 pour la recherche, les statistiques et les fiches établissement.
 
-## Purpose
+## Objectif
 
-The application retrieves the latest CSV published by the City of Montreal, detects whether it changed, updates the SQLite database without duplicating records, and exposes the data through REST endpoints. The scheduler runs in the background and can also be triggered manually via API.
+L'application récupère le dernier CSV publié par la Ville de Montréal, met à jour SQLite sans dupliquer les dossiers, et expose les données par une API REST. L'API sert aussi une interface Vue 3 (recherche, filtres, tri, pagination, export CSV, fiche établissement). La synchronisation tourne en arrière-plan et peut être lancée à la main via l'API.
 
-## Official source
+Interface web : **http://localhost:5067** (après `dotnet run`)
 
-The dataset comes directly from the City of Montreal:
+## Source officielle
+
+Le jeu de données vient directement de la Ville de Montréal :
 
 https://data.montreal.ca/dataset/05a9e718-6810-4e73-8bb9-5955efeb91a0/resource/7f939a08-be8a-45e1-b208-d8744dca8fc6/download/violations.csv
 
-The CSV is not committed to Git. The app downloads the live file at runtime.
+Le CSV n'est pas versionné dans Git. L'application télécharge le fichier en direct à l'exécution.
 
-## Real dataset analysis
+## Colonnes du fichier
 
-The actual file header includes these columns:
+L'en-tête réel contient ces colonnes :
 
 - id_poursuite
 - business_id
@@ -32,78 +34,95 @@ The actual file header includes these columns:
 - date_statut
 - categorie
 
-The unique record identity is the real field `id_poursuite`, which is the dataset’s stable identifier. This is the key used for inserts, updates, and duplicate prevention.
+L'identité unique d'un dossier est le champ `id_poursuite`. C'est la clé utilisée pour les insertions, les mises à jour et la prévention des doublons.
 
 ## Architecture
 
-- ASP.NET Core Web API
+```
+frontend/                                  # Interface Vue 3 (Vite, Composition API)
+src/
+├── MontrealFoodViolations.Api/            # API REST + wwwroot (build de production)
+├── MontrealFoodViolations.Application/    # contrats, modèles, options
+├── MontrealFoodViolations.Domain/         # entités
+└── MontrealFoodViolations.Infrastructure/ # EF Core, synchro CSV, client HTTP
+tests/
+└── MontrealFoodViolations.Tests/
+```
+
+- API web ASP.NET Core
+- Vue 3 (Composition API) + Vite
 - EF Core + SQLite
-- BackgroundService for scheduled sync
+- BackgroundService pour la synchro planifiée
 - HttpClient via IHttpClientFactory
-- Swagger/OpenAPI
-- xUnit tests
-- Dependency injection and logging
+- OpenAPI + Swagger UI (développement, `/swagger`)
+- Tests xUnit
+- Injection de dépendances et journalisation
 
-## Background synchronization
+## Synchronisation en arrière-plan
 
-The scheduler is implemented as `ViolationSyncBackgroundService` and runs based on the `ViolationSync:IntervalHours` value in configuration. The default is 24 hours.
+Le planificateur est `ViolationSyncBackgroundService`. Il suit `ViolationSync:IntervalHours`. La valeur par défaut est 24 heures. Une synchronisation part dès le démarrage, puis se répète à chaque intervalle.
 
-The loop follows this flow:
+Le cycle est le suivant :
 
-1. wait for the configured interval
-2. download the latest CSV
-3. validate the response
-4. parse the CSV
-5. compare against SQLite
-6. insert new rows
-7. update changed rows
-8. log the result
-9. wait for the next interval
+1. télécharger le dernier CSV
+2. valider la réponse
+3. analyser le CSV
+4. comparer avec SQLite
+5. insérer les nouvelles lignes
+6. mettre à jour les lignes modifiées
+7. journaliser le résultat
+8. attendre le prochain intervalle
 
-If the download fails, the app logs the issue and keeps the existing data intact.
+Si le téléchargement échoue, l'application journalise le problème et conserve les données déjà en base.
 
-## Database
+## Base de données
 
-SQLite is configured through the connection string in `appsettings.json`.
+SQLite est configuré par la chaîne de connexion dans `appsettings.json`. Les migrations EF Core s'appliquent automatiquement au démarrage.
 
-The main entities are:
+Les entités principales sont :
 
 - `Violation`
 - `DatasetSyncState`
 
-A migration is required to create the schema.
-
-## API endpoints
-
-- `GET /api/violations?page=1&pageSize=25`
-- `GET /api/violations/{id}`
-- `GET /api/violations/business/{businessId}`
-- `GET /api/violations/search`
-- `GET /api/violations/export`
-- `GET /api/violations/stats`
-- `POST /api/sync`
-- `GET /api/sync/status`
-
-## Installation
-
-1. Install the .NET SDK (the project targets .NET 10 in this environment).
-2. Restore packages.
-3. Apply migrations.
-4. Run the API.
-
-## Migrations
-
-From the project root:
+Pour appliquer les migrations à la main (optionnel) :
 
 ```bash
 dotnet ef database update --project src/MontrealFoodViolations.Api/MontrealFoodViolations.Api.csproj
 ```
 
-## Run
+## Endpoints de l'API
+
+- `GET /api/violations?page=1&pageSize=25` — liste paginée
+- `GET /api/violations/{id}` — détail d'une infraction
+- `GET /api/violations/business/{businessId}` — fiche établissement
+- `GET /api/violations/search` — recherche filtrée
+- `GET /api/violations/export` — export CSV
+- `GET /api/violations/stats` — statistiques des amendes
+- `POST /api/sync` — synchronisation manuelle
+- `GET /api/sync/status` — état de la dernière synchronisation
+
+## Installation
+
+1. Installer le SDK .NET (le projet cible .NET 10).
+2. Node.js n'est nécessaire que pour modifier l'interface Vue.
+3. Restaurer les paquets : `dotnet restore`
+4. Lancer l'API (le schéma est créé au démarrage).
+
+## Exécution
 
 ```bash
 dotnet run --project src/MontrealFoodViolations.Api/MontrealFoodViolations.Api.csproj
 ```
+
+Ouvrir **http://localhost:5067**. Swagger (développement seulement) est sur **http://localhost:5067/swagger**. ASP.NET sert le build Vue de production depuis `wwwroot`. Après une modification dans `frontend/` :
+
+```bash
+cd frontend
+npm install
+npm run build
+```
+
+Pour développer seulement l'interface, lancer l'API puis `npm run dev` dans `frontend/` (Vite proxifie `/api` vers `http://localhost:5067`).
 
 ## Tests
 
@@ -120,7 +139,7 @@ dotnet test
     "IntervalHours": 24
   },
   "MontrealDataset": {
-    "ViolationsUrl": "https://data.montreal.ca/.../violations.csv"
+    "ViolationsUrl": "https://data.montreal.ca/dataset/05a9e718-6810-4e73-8bb9-5955efeb91a0/resource/7f939a08-be8a-45e1-b208-d8744dca8fc6/download/violations.csv"
   },
   "ConnectionStrings": {
     "DefaultConnection": "Data Source=montrealfoodviolations.db"
@@ -128,23 +147,23 @@ dotnet test
 }
 ```
 
-## Synchronization strategy
+## Stratégie de synchronisation
 
-The sync process is idempotent. If the same file is downloaded again, existing rows are detected as unchanged and no duplicates are created. New rows are inserted, changed rows are updated, and no data is deleted unless explicitly required by a future design change.
+La synchronisation est idempotente. Si le même fichier est téléchargé à nouveau, les lignes inchangées sont reconnues et aucun doublon n'est créé. Les nouvelles lignes sont insérées, les lignes modifiées sont mises à jour, et aucune donnée n'est supprimée.
 
 ## Notes
 
-This project is structured to allow later evolution toward PostgreSQL, Azure, or another production environment without rewriting the whole application.
+Le projet est structuré pour pouvoir évoluer vers PostgreSQL, Azure ou un autre environnement de production sans tout réécrire.
 
-## Development
+## Développement
 
-This project was designed and architected by the author. AI coding tools (Cursor) were used to accelerate boilerplate generation, documentation, UI iterations, and refactoring suggestions.
+Le projet a été conçu et architecturé par l'auteur. Des outils d'IA (Cursor) ont accéléré le code répétitif, la documentation, les itérations d'interface et les suggestions de refactoring.
 
-Key decisions made manually:
+Décisions prises à la main :
 
-- clean architecture (Domain / Application / Infrastructure / API)
-- idempotent sync strategy using `id_poursuite`
-- data modeling from the official Montreal open dataset
-- API endpoint design and search experience
+- architecture en couches (Domain / Application / Infrastructure / API)
+- synchronisation idempotente fondée sur `id_poursuite`
+- modèle de données aligné sur le jeu de données ouvert de Montréal
+- conception des endpoints et de l'expérience de recherche
 
-See [DOCUMENTATION.md](DOCUMENTATION.md) for the full API guide in French.
+Le guide complet de l'API, en français, est dans [DOCUMENTATION.md](DOCUMENTATION.md).
