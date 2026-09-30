@@ -56,4 +56,28 @@ const emit = defineEmits(['sort', 'open-business']);
       </tbody>
     </table>
   </div>
+
+  <div class="result-cards">
+    <p v-if="loading || !items.length" class="empty">{{ emptyMessage }}</p>
+    <article v-for="item in items" v-else :key="item.idPoursuite" class="result-card">
+      <header>
+        <button
+          v-if="item.businessId"
+          type="button"
+          class="link-btn"
+          @click="emit('open-business', item.businessId)"
+        >
+          {{ item.etablissement || 'Établissement' }}
+        </button>
+        <strong v-else>{{ item.etablissement || 'Établissement' }}</strong>
+        <span :class="statusClass(item.statut)">{{ item.statut || '—' }}</span>
+      </header>
+      <p>{{ [item.adresse, item.ville].filter(Boolean).join(', ') || 'Adresse inconnue' }}</p>
+      <p class="result-card-meta">
+        <span>{{ formatCalendarDate(item.date) }}</span>
+        <span class="amount-cell">{{ item.montant != null ? formatCurrency(item.montant) : '—' }}</span>
+      </p>
+      <p>{{ item.categorie || 'Catégorie non précisée' }}</p>
+    </article>
+  </div>
 </template>
