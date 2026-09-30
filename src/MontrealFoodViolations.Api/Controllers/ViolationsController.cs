@@ -163,7 +163,7 @@ public class ViolationsController : ControllerBase
     }
 
     [HttpGet("stats")]
-    [EndpointSummary("Totaux et statistiques des amendes, pour une ville ou pour Montréal.")]
+    [EndpointSummary("Totaux des amendes pour la ville demandée, ou pour toutes les villes.")]
     public async Task<IActionResult> Stats([FromQuery] string? ville, CancellationToken cancellationToken)
     {
         var violations = ApplyVille(_dbContext.Violations.AsNoTracking(), ville);

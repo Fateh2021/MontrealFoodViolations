@@ -71,7 +71,25 @@ const activeSource = computed(() => {
   return { label: 'MAPAQ', url: MAPAQ_URL };
 });
 
-const yearNote = "Depuis 2024, ces totaux comptent toutes les villes. Avant, seule Montréal est disponible : le MAPAQ ne publie que les 24 derniers mois.";
+const everyCity = computed(() => !filters.ville || filters.ville === 'Toutes');
+
+const statsScope = computed(() =>
+  everyCity.value
+    ? 'Chiffres de toutes les villes.'
+    : `Chiffres de ${filters.ville} seulement.`
+);
+
+const yearNote = computed(() => {
+  if (everyCity.value) {
+    return 'Depuis 2024, ces totaux comptent toutes les villes. Avant, seule Montréal est disponible : le MAPAQ ne publie que les 24 derniers mois.';
+  }
+
+  if (filters.ville === 'Montréal') {
+    return "Ces totaux comptent uniquement l'agglomération de Montréal.";
+  }
+
+  return `Ces totaux comptent uniquement ${filters.ville}. Le MAPAQ ne publie que les 24 derniers mois.`;
+});
 
 const pageButtons = computed(() => {
   const maxButtons = 5;
@@ -134,8 +152,12 @@ function applyFinesStats(stats) {
 
 async function loadMeta() {
   try {
+    const statsParams = new URLSearchParams();
+    const ville = String(filters.ville || '').trim();
+    if (ville) statsParams.set('ville', ville);
+
     const [statsResponse, syncResponse] = await Promise.all([
-      fetch('/api/violations/stats?ville=Toutes'),
+      fetch(`/api/violations/stats?${statsParams}`),
       fetch('/api/sync/status')
     ]);
 
@@ -323,7 +345,7 @@ onUnmounted(() => {
           <h1>Montreal Food Violations</h1>
           <p class="subtitle">
             Consultez les condamnations alimentaires de Montréal et du reste du Québec.
-            Choisissez une ville pour limiter la liste. Recherchez un restaurant ou une adresse.
+            Choisissez une ville pour limiter la liste et les totaux. Recherchez un restaurant ou une adresse.
           </p>
         </div>
         <div class="topbar-actions">
@@ -347,11 +369,11 @@ onUnmounted(() => {
 
       <div class="meta-bar">
         <div class="meta-item">
-          <span>Infractions en base :</span>
+          <span>{{ everyCity ? 'Dossiers (toutes les villes)' : `Dossiers (${filters.ville})` }} :</span>
           <strong>{{ totalViolations }}</strong>
         </div>
         <div class="meta-item">
-          <span>Total des amendes :</span>
+          <span>{{ everyCity ? 'Amendes (toutes les villes)' : `Amendes (${filters.ville})` }} :</span>
           <strong>{{ totalFines }}</strong>
         </div>
         <div class="meta-item" :class="syncMetaClass">
@@ -372,6 +394,7 @@ onUnmounted(() => {
         :fines-by-year="finesByYear"
         :top-categories-by-fines="topCategoriesByFines"
         :fines-by-city="finesByCity"
+        :scope-note="statsScope"
         :year-note="yearNote"
       />
 
@@ -379,7 +402,7 @@ onUnmounted(() => {
         <div class="info-block">
           <h2>Comment chercher ?</h2>
           <ul>
-            <li>Le résumé des amendes couvre <strong>toutes les villes</strong>. Le menu Ville filtre seulement la liste.</li>
+            <li>Choisissez <strong>Toutes les villes</strong> pour les totaux du Québec, ou une ville pour les totaux de cette ville. La liste suit le même choix.</li>
             <li>Choisissez <strong>Montréal</strong> pour limiter la liste à l'agglomération.</li>
             <li>Écrivez un <strong>nom ou une adresse</strong>, puis cliquez sur Rechercher.</li>
             <li>Ouvrez <strong>Recherche avancée</strong> pour filtrer le statut, la catégorie ou le propriétaire.</li>

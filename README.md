@@ -46,7 +46,7 @@ L'identité unique d'un dossier est le champ `id_poursuite`. C'est la clé utili
 
 ## Interface web
 
-- Au départ, les amendes par année couvrent toutes les villes. Le menu **Ville** filtre seulement la liste. Montréal limite la liste à l'agglomération. Les autres choix viennent du MAPAQ.
+- Le menu **Ville** filtre la liste et les totaux d'amendes. **Toutes les villes** compte tout le Québec. Une ville, par exemple Laval, ne compte que cette municipalité. Montréal limite à l'agglomération.
 - Les années antérieures à 2024 ne contiennent que Montréal : le MAPAQ publie les 24 derniers mois.
 - Un bouton soleil ou lune change le thème. Le choix est conservé dans le navigateur.
 - Un champ **Nom ou adresse** lance la recherche. Les autres filtres sont rangés sous **Recherche avancée**.
