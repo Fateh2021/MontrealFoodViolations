@@ -58,6 +58,7 @@ En développement UI uniquement : lancer l'API, puis `npm run dev` dans `fronten
 
 ## Interface web
 
+- Le menu **Ville** envoie `ville`. `Montréal` limite aux dossiers de la Ville, y compris les arrondissements. Une autre valeur, par exemple `Laval`, ne garde que cette municipalité. `Toutes` retire le filtre.
 - La recherche commence par un champ **Nom ou adresse**. Il envoie le paramètre `search`. Les filtres établissement, adresse, catégorie, statut, propriétaire et description sont sous **Recherche avancée**.
 - Les colonnes visibles commencent par l'établissement, l'adresse, la date, la date de jugement, le montant et le statut. Les dates du calendrier sont en français.
 - Le tri initial est `Date` décroissant.
@@ -92,11 +93,12 @@ Base URL : `http://localhost:5067`
 | `GET` | `/api/violations/business/{businessId}` | Fiche établissement + historique |
 | `GET` | `/api/violations/search` | Recherche avancée avec filtres et tri |
 | `GET` | `/api/violations/export` | Export CSV (max 5 000 lignes) |
-| `GET` | `/api/violations/stats` | Statistiques globales et amendes |
+| `GET` | `/api/violations/cities` | Villes importées du MAPAQ |
+| `GET` | `/api/violations/stats` | Statistiques des amendes, filtrables par `ville` |
 
 #### Paramètres de recherche (`/search` et `/export`)
 
-- `search`, `etablissement`, `adresse`, `categorie`, `statut`, `proprietaire`, `description`
+- `search`, `etablissement`, `adresse`, `categorie`, `statut`, `proprietaire`, `description`, `ville`
 - `page`, `pageSize` (max 200), `sortBy`, `descending`
 
 **Tri (`sortBy`) :** `IdPoursuite`, `BusinessId`, `Etablissement`, `Adresse`, `Ville`, `Categorie`, `Statut`, `Proprietaire`, `Montant`, `Description`, `Date`, `DateJugement`

@@ -2,6 +2,10 @@
 const filters = defineModel('filters', { type: Object, required: true });
 const pageSize = defineModel('pageSize', { type: Number, required: true });
 
+defineProps({
+  cities: { type: Array, default: () => [] }
+});
+
 const emit = defineEmits(['search', 'export', 'reset']);
 
 function onPageSizeChange(event) {
@@ -12,6 +16,11 @@ function onPageSizeChange(event) {
 
 <template>
   <div class="search-bar">
+    <select v-model="filters.ville" aria-label="Ville" @change="emit('search')">
+      <option value="Montréal">Montréal</option>
+      <option value="Toutes">Toutes les villes</option>
+      <option v-for="city in cities" :key="city" :value="city">{{ city }}</option>
+    </select>
     <input
       v-model.trim="filters.search"
       type="search"

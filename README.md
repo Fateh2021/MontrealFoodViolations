@@ -18,6 +18,12 @@ https://data.montreal.ca/dataset/05a9e718-6810-4e73-8bb9-5955efeb91a0/resource/7
 
 Le CSV n'est pas versionné dans Git. L'application télécharge le fichier en direct à l'exécution.
 
+Les condamnations hors Montréal viennent du MAPAQ, licence CC-BY 4.0 :
+
+https://www.donneesquebec.ca/recherche/dataset/515374ee-ce34-464f-9875-7d1af3fa9b2a/resource/40105615-3abf-414b-bcba-182e8f2c5eb2/download/listecondamnation.csv
+
+L'agglomération de Montréal reste sur le fichier de la Ville. Le fichier du MAPAQ couvre les autres municipalités, dont Laval et Longueuil. Il ne contient pas de statut Ouvert / Fermé, sauf lorsqu'il indique que l'exploitant a cessé ses opérations.
+
 ## Colonnes du fichier
 
 L'en-tête réel contient ces colonnes :
@@ -40,6 +46,7 @@ L'identité unique d'un dossier est le champ `id_poursuite`. C'est la clé utili
 
 ## Interface web
 
+- Le menu **Ville** est sur Montréal au départ (toute l'agglomération). Les autres choix viennent du MAPAQ. « Toutes les villes » affiche les deux sources.
 - Un champ **Nom ou adresse** lance la recherche. Les autres filtres sont rangés sous **Recherche avancée**.
 - Le tableau commence par l'établissement, l'adresse, les dates, le montant et le statut. Les dates sont affichées en français, par exemple « 30 janvier 2025 ». Le statut Ouvert est vert et Fermé est rouge.
 - Le tri par défaut va de la date la plus récente à la plus ancienne.
@@ -106,7 +113,8 @@ dotnet ef database update --project src/MontrealFoodViolations.Api/MontrealFoodV
 - `GET /api/violations?page=1&pageSize=25` — liste paginée
 - `GET /api/violations/{id}` — détail d'une infraction
 - `GET /api/violations/business/{businessId}` — fiche établissement
-- `GET /api/violations/search` — recherche filtrée
+- `GET /api/violations/cities` — villes disponibles hors Montréal
+- `GET /api/violations/search` — recherche filtrée, avec `ville`
 - `GET /api/violations/export` — export CSV
 - `GET /api/violations/stats` — statistiques des amendes
 - `POST /api/sync` — synchronisation manuelle
