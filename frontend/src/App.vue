@@ -323,8 +323,8 @@ onUnmounted(() => {
         <div class="info-block">
           <h2>Comment chercher ?</h2>
           <ul>
-            <li>Utilisez la <strong>recherche globale</strong> pour chercher partout en une fois.</li>
-            <li>Affinez avec les filtres (établissement, adresse, catégorie, statut, etc.).</li>
+            <li>Écrivez un <strong>nom ou une adresse</strong>, puis cliquez sur Rechercher.</li>
+            <li>Ouvrez <strong>Recherche avancée</strong> pour filtrer le statut, la catégorie ou le propriétaire.</li>
             <li>Cliquez sur les en-têtes de colonnes pour <strong>trier</strong> les résultats.</li>
             <li>Cliquez sur un <strong>établissement</strong> pour voir sa fiche complète.</li>
             <li>Utilisez <strong>Exporter CSV</strong> pour télécharger les résultats filtrés.</li>
