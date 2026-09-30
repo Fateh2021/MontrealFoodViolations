@@ -21,6 +21,14 @@ const filters = reactive({
 });
 
 const cities = ref([]);
+const dark = ref(document.documentElement.dataset.theme === 'dark');
+
+function toggleTheme() {
+  dark.value = !dark.value;
+  const theme = dark.value ? 'dark' : 'light';
+  document.documentElement.dataset.theme = theme;
+  localStorage.setItem('theme', theme);
+}
 
 const page = ref(1);
 const pageSize = ref(25);
@@ -317,7 +325,12 @@ onUnmounted(() => {
             pour voir celles publiées par le MAPAQ. Recherchez un restaurant ou une adresse.
           </p>
         </div>
-        <span class="badge-pill">Données ouvertes</span>
+        <div class="topbar-actions">
+          <button class="theme-toggle" type="button" @click="toggleTheme">
+            {{ dark ? 'Mode clair' : 'Mode sombre' }}
+          </button>
+          <span class="badge-pill">Données ouvertes</span>
+        </div>
       </div>
 
       <div class="meta-bar">
