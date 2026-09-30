@@ -4,9 +4,11 @@ MontrealFoodViolations est une application full-stack .NET 10 : une API ASP.NET 
 
 ## Objectif
 
-L'application récupère le dernier CSV publié par la Ville de Montréal, met à jour SQLite sans dupliquer les dossiers, et expose les données par une API REST. L'API sert aussi une interface Vue 3 (recherche, filtres, tri, pagination, export CSV, fiche établissement). La synchronisation tourne en arrière-plan et peut être lancée à la main via l'API.
+L'application récupère le dernier CSV publié par la Ville de Montréal, met à jour SQLite sans dupliquer les dossiers, et expose les données par une API REST. L'API sert aussi une interface Vue 3 : un champ « Nom ou adresse », une recherche avancée, le tri, la pagination, l'export CSV et la fiche établissement. Sur un téléphone, les résultats sont des fiches. La synchronisation tourne en arrière-plan et peut être lancée à la main via l'API.
 
-Interface web : **http://localhost:5067** (après `dotnet run`)
+Interface locale : **http://localhost:5067** (après `dotnet run`)
+
+Site déployé : **https://montrealfoodviolations-bsfrgnhtfygrduhu.canadaeast-01.azurewebsites.net**
 
 ## Source officielle
 
@@ -35,6 +37,15 @@ L'en-tête réel contient ces colonnes :
 - categorie
 
 L'identité unique d'un dossier est le champ `id_poursuite`. C'est la clé utilisée pour les insertions, les mises à jour et la prévention des doublons.
+
+## Interface web
+
+- Un champ **Nom ou adresse** lance la recherche. Les autres filtres sont rangés sous **Recherche avancée**.
+- Le tableau commence par l'établissement, l'adresse, les dates, le montant et le statut. Les dates sont affichées en français, par exemple « 30 janvier 2025 ». Le statut Ouvert est vert et Fermé est rouge.
+- Le tri par défaut va de la date la plus récente à la plus ancienne.
+- Les identifiants techniques (`id_poursuite`, `business_id`) restent dans l'API, les clés internes et l'export CSV. Ils ne sont pas affichés dans le tableau ni dans la fiche établissement.
+- En dessous de 720 px, le tableau est remplacé par des fiches. Toucher le nom ouvre l'historique de l'établissement.
+- L'export CSV télécharge les résultats filtrés, jusqu'à 5 000 lignes.
 
 ## Architecture
 
@@ -151,9 +162,15 @@ dotnet test
 
 La synchronisation est idempotente. Si le même fichier est téléchargé à nouveau, les lignes inchangées sont reconnues et aucun doublon n'est créé. Les nouvelles lignes sont insérées, les lignes modifiées sont mises à jour, et aucune donnée n'est supprimée.
 
+## Hébergement
+
+L'API et l'interface sont déployées sur Azure App Service (offre gratuite F1), depuis la branche `master`. Le workflow GitHub Actions publie le projet .NET. Le build Vue de `wwwroot` est déjà dans le dépôt, donc le pipeline ne lance pas `npm`.
+
+Les profils de publication Azure, les fichiers `.env`, `secrets.json` et les certificats sont ignorés par Git. Le mot de passe de déploiement reste dans un secret GitHub.
+
 ## Notes
 
-Le projet est structuré pour pouvoir évoluer vers PostgreSQL, Azure ou un autre environnement de production sans tout réécrire.
+Le projet reste structuré pour pouvoir changer de base de données plus tard. SQLite est la base utilisée en local et sur Azure.
 
 ## Développement
 
