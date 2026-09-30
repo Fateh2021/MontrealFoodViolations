@@ -571,10 +571,43 @@
       color: var(--primary);
     }
 
+    .result-cards {
+      display: none;
+    }
+
+    .result-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 16px;
+    }
+
+    .result-card header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .result-card p {
+      margin: 0 0 6px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .result-card-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
     @media (max-width: 720px) {
       .container { padding: 12px; }
       .card { padding: 16px; }
       .topbar { align-items: flex-start; }
       .search-bar { grid-template-columns: 1fr; }
       .search-bar button { width: 100%; }
+      .table-wrap { display: none; }
+      .result-cards { display: grid; gap: 12px; }
     }
