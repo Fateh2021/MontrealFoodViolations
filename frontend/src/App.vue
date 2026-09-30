@@ -20,8 +20,8 @@ const filters = reactive({
 
 const page = ref(1);
 const pageSize = ref(25);
-const sortBy = ref('IdPoursuite');
-const descending = ref(false);
+const sortBy = ref('Date');
+const descending = ref(true);
 
 const items = ref([]);
 const totalCount = ref(0);
@@ -209,8 +209,8 @@ function resetFilters() {
   filters.description = '';
   pageSize.value = 25;
   page.value = 1;
-  sortBy.value = 'IdPoursuite';
-  descending.value = false;
+  sortBy.value = 'Date';
+  descending.value = true;
   search();
 }
 
@@ -368,6 +368,7 @@ onUnmounted(() => {
               <tr><th>Description</th><td>Détail de la violation constatée.</td></tr>
               <tr><th>Statut</th><td>Statut de l'établissement (Ouvert, Fermé, changement d'exploitant, etc.).</td></tr>
               <tr><th>Date</th><td>Date de l'infraction.</td></tr>
+              <tr><th>Date jugement</th><td>Date du jugement, liée au montant de l'amende.</td></tr>
               <tr><th>Montant</th><td>Amende imposée pour la condamnation (en dollars canadiens).</td></tr>
               <tr><th>Propriétaire</th><td>Nom du propriétaire déclaré.</td></tr>
             </tbody>
