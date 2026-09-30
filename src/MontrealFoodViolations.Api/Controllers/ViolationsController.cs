@@ -82,8 +82,22 @@ public class ViolationsController : ControllerBase
         return Ok(violation);
     }
 
+    [HttpGet("cities")]
+    [EndpointSummary("Villes du MAPAQ, hors agglomération de Montréal.")]
+    public async Task<IActionResult> Cities(CancellationToken cancellationToken)
+    {
+        var cities = await _dbContext.Violations.AsNoTracking()
+            .Where(violation => violation.Source == "Mapaq" && violation.Ville != null && violation.Ville != "")
+            .Select(violation => violation.Ville!)
+            .Distinct()
+            .OrderBy(city => city)
+            .ToListAsync(cancellationToken);
+
+        return Ok(new { cities });
+    }
+
     [HttpGet("search")]
-    [EndpointSummary("Recherche filtrée, avec tri et pagination.")]
+    [EndpointSummary("Recherche filtrée, avec tri et pagination. ville=Montréal limite à l'agglomération.")]
     public async Task<IActionResult> Search(
         [FromQuery] string? search,
         [FromQuery] string? etablissement,
@@ -92,13 +106,16 @@ public class ViolationsController : ControllerBase
         [FromQuery] string? statut,
         [FromQuery] string? proprietaire,
         [FromQuery] string? description,
+        [FromQuery] string? ville,
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 25,
         [FromQuery] string sortBy = "IdPoursuite",
         [FromQuery] bool descending = false,
         CancellationToken cancellationToken = default)
     {
-        var dbQuery = ApplySearchFilters(_dbContext.Violations.AsNoTracking(), search, etablissement, adresse, categorie, statut, proprietaire, description);
+        var dbQuery = ApplyVille(
+            ApplySearchFilters(_dbContext.Violations.AsNoTracking(), search, etablissement, adresse, categorie, statut, proprietaire, description),
+            ville);
         var orderedQuery = ApplySort(dbQuery, sortBy, descending);
 
         page = Math.Max(1, page);
@@ -127,30 +144,34 @@ public class ViolationsController : ControllerBase
         [FromQuery] string? statut,
         [FromQuery] string? proprietaire,
         [FromQuery] string? description,
+        [FromQuery] string? ville,
         [FromQuery] string sortBy = "IdPoursuite",
         [FromQuery] bool descending = false,
         CancellationToken cancellationToken = default)
     {
         const int maxRows = 5000;
-        var dbQuery = ApplySearchFilters(_dbContext.Violations.AsNoTracking(), search, etablissement, adresse, categorie, statut, proprietaire, description);
+        var dbQuery = ApplyVille(
+            ApplySearchFilters(_dbContext.Violations.AsNoTracking(), search, etablissement, adresse, categorie, statut, proprietaire, description),
+            ville);
         var orderedQuery = ApplySort(dbQuery, sortBy, descending);
 
         var items = await orderedQuery.Take(maxRows).ToListAsync(cancellationToken);
         var csv = "\uFEFF" + BuildCsv(items);
-        var fileName = $"violations-montreal-{DateTime.UtcNow:yyyyMMdd-HHmmss}.csv";
+        var fileName = $"condamnations-alimentaires-{DateTime.UtcNow:yyyyMMdd-HHmmss}.csv";
 
         return File(Encoding.UTF8.GetBytes(csv), "text/csv; charset=utf-8", fileName);
     }
 
     [HttpGet("stats")]
-    [EndpointSummary("Totaux et statistiques des amendes.")]
-    public async Task<IActionResult> Stats(CancellationToken cancellationToken)
+    [EndpointSummary("Totaux et statistiques des amendes, pour une ville ou pour Montréal.")]
+    public async Task<IActionResult> Stats([FromQuery] string? ville, CancellationToken cancellationToken)
     {
-        var total = await _dbContext.Violations.AsNoTracking().CountAsync(cancellationToken);
-        var byCity = await _dbContext.Violations.AsNoTracking().Where(x => x.Ville != null).GroupBy(x => x.Ville).Select(g => new { City = g.Key, Count = g.Count() }).OrderByDescending(x => x.Count).Take(10).ToListAsync(cancellationToken);
-        var byCategory = await _dbContext.Violations.AsNoTracking().Where(x => x.Categorie != null).GroupBy(x => x.Categorie).Select(g => new { Category = g.Key, Count = g.Count() }).OrderByDescending(x => x.Count).Take(10).ToListAsync(cancellationToken);
+        var violations = ApplyVille(_dbContext.Violations.AsNoTracking(), ville);
+        var total = await violations.CountAsync(cancellationToken);
+        var byCity = await violations.Where(x => x.Ville != null).GroupBy(x => x.Ville).Select(g => new { City = g.Key, Count = g.Count() }).OrderByDescending(x => x.Count).Take(10).ToListAsync(cancellationToken);
+        var byCategory = await violations.Where(x => x.Categorie != null).GroupBy(x => x.Categorie).Select(g => new { Category = g.Key, Count = g.Count() }).OrderByDescending(x => x.Count).Take(10).ToListAsync(cancellationToken);
 
-        var fineRecords = await _dbContext.Violations.AsNoTracking()
+        var fineRecords = await violations
             .Where(x => x.Montant != null)
             .Select(x => new { x.Montant, x.DateJugement, x.Categorie, x.Ville })
             .ToListAsync(cancellationToken);
@@ -277,6 +298,25 @@ public class ViolationsController : ControllerBase
         }
 
         return dbQuery;
+    }
+
+    private static IQueryable<Violation> ApplyVille(IQueryable<Violation> dbQuery, string? ville)
+    {
+        if (string.IsNullOrWhiteSpace(ville)
+            || ville.Equals("toutes", StringComparison.OrdinalIgnoreCase)
+            || ville.Equals("toutes les villes", StringComparison.OrdinalIgnoreCase))
+        {
+            return dbQuery;
+        }
+
+        if (ville.Equals("montréal", StringComparison.OrdinalIgnoreCase)
+            || ville.Equals("montreal", StringComparison.OrdinalIgnoreCase))
+        {
+            return dbQuery.Where(violation => violation.Source == "Montreal");
+        }
+
+        var normalized = ville.Trim().ToLower();
+        return dbQuery.Where(violation => violation.Ville != null && violation.Ville.ToLower() == normalized);
     }
 
     private static IQueryable<Violation> ApplySort(IQueryable<Violation> dbQuery, string sortBy, bool descending)
