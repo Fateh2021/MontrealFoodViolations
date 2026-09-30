@@ -23,11 +23,17 @@ public sealed class MontrealDatasetClient : IMontrealDatasetClient
         _httpClient.Timeout = TimeSpan.FromSeconds(Math.Max(15, _options.TimeoutSeconds));
     }
 
-    public async Task<DatasetDownloadResult> DownloadAsync(CancellationToken cancellationToken = default)
-    {
-        _logger.LogInformation("Downloading Montreal violations dataset from {Url}", _options.ViolationsUrl);
+    public Task<DatasetDownloadResult> DownloadAsync(CancellationToken cancellationToken = default)
+        => DownloadFromUrlAsync(_options.ViolationsUrl, "Montreal violations", cancellationToken);
 
-        using var response = await _httpClient.GetAsync(_options.ViolationsUrl, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+    public Task<DatasetDownloadResult> DownloadConvictionsAsync(CancellationToken cancellationToken = default)
+        => DownloadFromUrlAsync(_options.ConvictionsUrl, "MAPAQ convictions", cancellationToken);
+
+    private async Task<DatasetDownloadResult> DownloadFromUrlAsync(string url, string datasetName, CancellationToken cancellationToken)
+    {
+        _logger.LogInformation("Downloading {DatasetName} from {Url}", datasetName, url);
+
+        using var response = await _httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
 
         if (!response.IsSuccessStatusCode)
         {
