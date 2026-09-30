@@ -46,7 +46,9 @@ L'identité unique d'un dossier est le champ `id_poursuite`. C'est la clé utili
 
 ## Interface web
 
-- Le menu **Ville** filtre la liste et les totaux d'amendes. **Toutes les villes** compte tout le Québec. Une ville, par exemple Laval, ne compte que cette municipalité. Montréal limite à l'agglomération.
+- Le menu **Ville** filtre la liste et les totaux d'amendes. Montréal et **Toutes les villes** restent en tête. Laval, Longueuil, Québec et Gatineau suivent sous **Villes fréquentes**, puis les autres municipalités. **Toutes les villes** compte tout le Québec. Montréal limite à l'agglomération.
+- Les catégories du MAPAQ sont affichées en français clair. La recherche et l'export gardent le libellé d'origine.
+- L'amende la plus élevée d'une page est mise en évidence. La fiche d'un établissement résume le nombre d'amendes, le total et le mois du dernier dossier.
 - Les années antérieures à 2024 ne contiennent que Montréal : le MAPAQ publie les 24 derniers mois.
 - Un bouton soleil ou lune change le thème. Le choix est conservé dans le navigateur.
 - Un champ **Nom ou adresse** lance la recherche. Les autres filtres sont rangés sous **Recherche avancée**.

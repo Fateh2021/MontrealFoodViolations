@@ -258,6 +258,20 @@
       white-space: nowrap;
     }
 
+    .amount-high {
+      color: var(--warning-strong);
+      background: var(--warning-bg);
+      border: 1px solid var(--warning-border);
+      border-radius: 999px;
+      padding: 2px 8px;
+    }
+
+    .business-summary {
+      margin: 8px 0 0;
+      color: var(--text);
+      font-weight: 700;
+    }
+
     .link-btn {
       background: none;
       border: none;

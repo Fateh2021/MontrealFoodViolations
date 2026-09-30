@@ -1,13 +1,20 @@
 <script setup>
-import { formatCalendarDate, formatCurrency, statusClass } from '../formatters';
+import { computed } from 'vue';
+import { formatCategory } from '../categories';
+import { formatCalendarDate, formatCurrency, highestFine, statusClass } from '../formatters';
 
-defineProps({
+const props = defineProps({
   items: { type: Array, default: () => [] },
   emptyMessage: { type: String, default: '' },
   loading: { type: Boolean, default: false }
 });
 
 const emit = defineEmits(['sort', 'open-business']);
+const peakFine = computed(() => highestFine(props.items));
+
+function isPeakFine(item) {
+  return peakFine.value != null && Number(item.montant) === peakFine.value;
+}
 </script>
 
 <template>
@@ -46,10 +53,16 @@ const emit = defineEmits(['sort', 'open-business']);
           <td>{{ item.adresse ?? '' }}</td>
           <td>{{ formatCalendarDate(item.date) }}</td>
           <td>{{ formatCalendarDate(item.dateJugement) }}</td>
-          <td class="amount-cell">{{ item.montant != null ? formatCurrency(item.montant) : '—' }}</td>
+          <td>
+            <span
+              class="amount-cell"
+              :class="{ 'amount-high': isPeakFine(item) }"
+              :title="isPeakFine(item) ? 'Amende la plus élevée de cette page' : undefined"
+            >{{ item.montant != null ? formatCurrency(item.montant) : '—' }}</span>
+          </td>
           <td><span :class="statusClass(item.statut)">{{ item.statut || '—' }}</span></td>
           <td>{{ item.ville ?? '' }}</td>
-          <td>{{ item.categorie ?? '' }}</td>
+          <td>{{ formatCategory(item.categorie) || '—' }}</td>
           <td>{{ item.proprietaire ?? '' }}</td>
           <td>{{ item.description ?? '' }}</td>
         </tr>
@@ -75,9 +88,13 @@ const emit = defineEmits(['sort', 'open-business']);
       <p>{{ [item.adresse, item.ville].filter(Boolean).join(', ') || 'Adresse inconnue' }}</p>
       <p class="result-card-meta">
         <span>{{ formatCalendarDate(item.date) }}</span>
-        <span class="amount-cell">{{ item.montant != null ? formatCurrency(item.montant) : '—' }}</span>
+        <span
+          class="amount-cell"
+          :class="{ 'amount-high': isPeakFine(item) }"
+          :title="isPeakFine(item) ? 'Amende la plus élevée de cette page' : undefined"
+        >{{ item.montant != null ? formatCurrency(item.montant) : '—' }}</span>
       </p>
-      <p>{{ item.categorie || 'Catégorie non précisée' }}</p>
+      <p>{{ formatCategory(item.categorie) || 'Catégorie non précisée' }}</p>
     </article>
   </div>
 </template>
