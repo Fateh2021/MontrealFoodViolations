@@ -36,7 +36,9 @@ cd MontrealFoodViolations
 dotnet run --project src/MontrealFoodViolations.Api/MontrealFoodViolations.Api.csproj
 ```
 
-Interface web : **http://localhost:5067**
+Interface locale : **http://localhost:5067**
+
+Site déployé : **https://montrealfoodviolations-bsfrgnhtfygrduhu.canadaeast-01.azurewebsites.net**
 
 Swagger : **`/swagger`** (local et production)
 
@@ -51,6 +53,16 @@ npm run build
 ```
 
 En développement UI uniquement : lancer l'API, puis `npm run dev` dans `frontend/` (Vite proxifie `/api` vers `http://localhost:5067`). Node.js n'est pas requis pour simplement exécuter le projet.
+
+---
+
+## Interface web
+
+- La recherche commence par un champ **Nom ou adresse**. Il envoie le paramètre `search`. Les filtres établissement, adresse, catégorie, statut, propriétaire et description sont sous **Recherche avancée**.
+- Les colonnes visibles commencent par l'établissement, l'adresse, la date, la date de jugement, le montant et le statut. Les dates du calendrier sont en français.
+- Le tri initial est `Date` décroissant.
+- `id_poursuite` et `business_id` ne sont pas affichés. Le clic sur un établissement utilise encore `businessId` pour ouvrir la fiche.
+- Sous 720 px de large, des fiches remplacent le tableau. Chaque fiche montre le nom, l'adresse, la date, le montant, le statut et la catégorie.
 
 ---
 
