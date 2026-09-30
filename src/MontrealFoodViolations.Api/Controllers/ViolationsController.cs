@@ -173,7 +173,7 @@ public class ViolationsController : ControllerBase
 
         var fineRecords = await violations
             .Where(x => x.Montant != null)
-            .Select(x => new { x.Montant, x.DateJugement, x.Categorie, x.Ville })
+            .Select(x => new { x.Montant, x.DateJugement, x.Categorie, x.Ville, x.Source })
             .ToListAsync(cancellationToken);
 
         var fined = fineRecords.Where(x => x.Montant > 0).ToList();
@@ -209,8 +209,15 @@ public class ViolationsController : ControllerBase
             .ToList();
 
         var finesByCity = fined
-            .Where(x => x.Ville != null)
-            .GroupBy(x => x.Ville!)
+            .Select(x => new
+            {
+                x.Montant,
+                Territory = IncludesEveryCity(ville) && x.Source == "Montreal"
+                    ? "Montréal"
+                    : x.Ville
+            })
+            .Where(x => x.Territory != null)
+            .GroupBy(x => x.Territory!)
             .Select(g => new
             {
                 City = g.Key,
@@ -300,22 +307,28 @@ public class ViolationsController : ControllerBase
         return dbQuery;
     }
 
+    private static bool IncludesEveryCity(string? ville)
+    {
+        return string.IsNullOrWhiteSpace(ville)
+            || ville.Equals("toutes", StringComparison.OrdinalIgnoreCase)
+            || ville.Equals("toutes les villes", StringComparison.OrdinalIgnoreCase);
+    }
+
     private static IQueryable<Violation> ApplyVille(IQueryable<Violation> dbQuery, string? ville)
     {
-        if (string.IsNullOrWhiteSpace(ville)
-            || ville.Equals("toutes", StringComparison.OrdinalIgnoreCase)
-            || ville.Equals("toutes les villes", StringComparison.OrdinalIgnoreCase))
+        if (IncludesEveryCity(ville))
         {
             return dbQuery;
         }
 
-        if (ville.Equals("montréal", StringComparison.OrdinalIgnoreCase)
-            || ville.Equals("montreal", StringComparison.OrdinalIgnoreCase))
+        var selected = ville!.Trim();
+        if (selected.Equals("montréal", StringComparison.OrdinalIgnoreCase)
+            || selected.Equals("montreal", StringComparison.OrdinalIgnoreCase))
         {
             return dbQuery.Where(violation => violation.Source == "Montreal");
         }
 
-        var normalized = ville.Trim().ToLower();
+        var normalized = selected.ToLower();
         return dbQuery.Where(violation => violation.Ville != null && violation.Ville.ToLower() == normalized);
     }
 

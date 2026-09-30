@@ -46,7 +46,8 @@ L'identité unique d'un dossier est le champ `id_poursuite`. C'est la clé utili
 
 ## Interface web
 
-- Le menu **Ville** est sur Montréal au départ (toute l'agglomération). Les autres choix viennent du MAPAQ. « Toutes les villes » affiche les deux sources.
+- Au départ, les amendes par année couvrent toutes les villes. Le menu **Ville** filtre seulement la liste. Montréal limite la liste à l'agglomération. Les autres choix viennent du MAPAQ.
+- Les années antérieures à 2024 ne contiennent que Montréal : le MAPAQ publie les 24 derniers mois.
 - Un bouton soleil ou lune change le thème. Le choix est conservé dans le navigateur.
 - Un champ **Nom ou adresse** lance la recherche. Les autres filtres sont rangés sous **Recherche avancée**.
 - Le tableau commence par l'établissement, l'adresse, les dates, le montant et le statut. Les dates sont affichées en français, par exemple « 30 janvier 2025 ». Le statut Ouvert est vert et Fermé est rouge.
