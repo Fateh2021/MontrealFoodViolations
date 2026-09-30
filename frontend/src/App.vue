@@ -326,8 +326,19 @@ onUnmounted(() => {
           </p>
         </div>
         <div class="topbar-actions">
-          <button class="theme-toggle" type="button" @click="toggleTheme">
-            {{ dark ? 'Mode clair' : 'Mode sombre' }}
+          <button
+            class="theme-toggle"
+            type="button"
+            :aria-label="dark ? 'Mode clair' : 'Mode sombre'"
+            @click="toggleTheme"
+          >
+            <svg v-if="dark" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2" />
+              <path stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M12 2v2.2M12 19.8V22M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M2 12h2.2M19.8 12H22M4.9 19.1l1.6-1.6M17.5 6.5l1.6-1.6" />
+            </svg>
+            <svg v-else viewBox="0 0 24 24" aria-hidden="true">
+              <path fill="currentColor" d="M21 14.5A8.5 8.5 0 0 1 9.5 3a7 7 0 1 0 11.5 11.5z" />
+            </svg>
           </button>
           <span class="badge-pill">Données ouvertes</span>
         </div>

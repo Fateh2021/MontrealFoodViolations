@@ -47,7 +47,7 @@ L'identité unique d'un dossier est le champ `id_poursuite`. C'est la clé utili
 ## Interface web
 
 - Le menu **Ville** est sur Montréal au départ (toute l'agglomération). Les autres choix viennent du MAPAQ. « Toutes les villes » affiche les deux sources.
-- Un bouton **Mode sombre** change le thème. Le choix est conservé dans le navigateur.
+- Un bouton soleil ou lune change le thème. Le choix est conservé dans le navigateur.
 - Un champ **Nom ou adresse** lance la recherche. Les autres filtres sont rangés sous **Recherche avancée**.
 - Le tableau commence par l'établissement, l'adresse, les dates, le montant et le statut. Les dates sont affichées en français, par exemple « 30 janvier 2025 ». Le statut Ouvert est vert et Fermé est rouge.
 - Le tri par défaut va de la date la plus récente à la plus ancienne.

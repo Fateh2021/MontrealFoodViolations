@@ -533,12 +533,22 @@
     }
 
     .theme-toggle {
-      width: auto;
-      min-width: 0;
-      padding: 8px 12px;
+      width: 42px;
+      min-width: 42px;
+      height: 42px;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       border-radius: 999px;
       background: var(--secondary);
       color: var(--text);
+    }
+
+    .theme-toggle svg {
+      width: 22px;
+      height: 22px;
+      display: block;
     }
 
     .page-btn:disabled {
