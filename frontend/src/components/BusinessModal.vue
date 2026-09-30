@@ -38,7 +38,6 @@ function onBackdropClick(event) {
       </div>
 
       <div v-if="!loading && !error && data" class="modal-meta">
-        <div class="meta-item"><span>Business ID :</span><strong>{{ formatNumber(data.businessId) }}</strong></div>
         <div class="meta-item"><span>Infractions :</span><strong>{{ formatNumber(data.violationCount) }}</strong></div>
         <div class="meta-item"><span>Total amendes :</span><strong>{{ formatCurrency(data.totalFines, true) }}</strong></div>
         <div class="meta-item"><span>Propriétaire :</span><strong>{{ data.proprietaire || '—' }}</strong></div>

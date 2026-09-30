@@ -15,8 +15,6 @@ const emit = defineEmits(['sort', 'open-business']);
     <table>
       <thead>
         <tr>
-          <th><button type="button" @click="emit('sort', 'idPoursuite')">ID</button></th>
-          <th><button type="button" @click="emit('sort', 'businessId')">Business ID</button></th>
           <th><button type="button" @click="emit('sort', 'etablissement')">Établissement</button></th>
           <th><button type="button" @click="emit('sort', 'adresse')">Adresse</button></th>
           <th><button type="button" @click="emit('sort', 'ville')">Ville</button></th>
@@ -30,20 +28,9 @@ const emit = defineEmits(['sort', 'open-business']);
       </thead>
       <tbody>
         <tr v-if="loading || !items.length">
-          <td colspan="11" class="empty">{{ emptyMessage }}</td>
+          <td colspan="9" class="empty">{{ emptyMessage }}</td>
         </tr>
         <tr v-for="item in items" :key="item.idPoursuite">
-          <td><span class="badge">{{ item.idPoursuite ?? '' }}</span></td>
-          <td>
-            <button
-              v-if="item.businessId"
-              type="button"
-              class="link-btn"
-              @click="emit('open-business', item.businessId)"
-            >
-              {{ item.businessId }}
-            </button>
-          </td>
           <td>
             <button
               v-if="item.businessId"
