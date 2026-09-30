@@ -1,6 +1,6 @@
-# MontrealFoodViolations
+# Registre alimentaire
 
-MontrealFoodViolations est une application full-stack .NET 10 : une API ASP.NET Core qui télécharge, analyse et synchronise le jeu de données public des infractions alimentaires de Montréal dans SQLite, plus une interface Vue 3 pour la recherche, les statistiques et les fiches établissement.
+**Registre alimentaire** est le nom du site. Le dépôt technique s'appelle MontrealFoodViolations. C'est une application full-stack .NET 10 : une API ASP.NET Core qui télécharge, analyse et synchronise les condamnations alimentaires de Montréal et du MAPAQ dans SQLite, plus une interface Vue 3 pour la recherche, les statistiques et les fiches établissement.
 
 ## Objectif
 

@@ -1,4 +1,4 @@
-# Montreal Food Violations — Guide d'exécution et documentation API
+# Registre alimentaire — Guide d'exécution et documentation API
 
 Ce document explique comment lancer le projet, utiliser l'interface web et consommer chaque endpoint de l'API REST.
 
@@ -6,7 +6,7 @@ Ce document explique comment lancer le projet, utiliser l'interface web et conso
 
 ## Présentation
 
-**Montreal Food Violations** est une application ASP.NET Core qui :
+**Registre alimentaire** (dépôt MontrealFoodViolations) est une application ASP.NET Core qui :
 
 - télécharge automatiquement le CSV officiel des infractions alimentaires de la Ville de Montréal ;
 - stocke les données dans une base **SQLite** ;

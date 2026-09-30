@@ -343,9 +343,9 @@ onUnmounted(() => {
     <div class="card">
       <div class="topbar">
         <div>
-          <h1>Montreal Food Violations</h1>
+          <h1>Registre alimentaire</h1>
           <p class="subtitle">
-            Consultez les condamnations alimentaires de Montréal et du reste du Québec.
+            Condamnations et amendes au Québec.
             Choisissez une ville pour limiter la liste et les totaux. Recherchez un restaurant ou une adresse.
           </p>
         </div>
