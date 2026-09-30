@@ -1,0 +1,25 @@
+@RegistreAlimentaire.Api_HostAddress = http://localhost:5067
+
+### Liste paginée
+GET {{RegistreAlimentaire.Api_HostAddress}}/api/violations?page=1&pageSize=10
+Accept: application/json
+
+### Recherche
+GET {{RegistreAlimentaire.Api_HostAddress}}/api/violations/search?search=pizza&page=1&pageSize=25
+Accept: application/json
+
+### Statistiques
+GET {{RegistreAlimentaire.Api_HostAddress}}/api/violations/stats
+Accept: application/json
+
+### Fiche établissement
+GET {{RegistreAlimentaire.Api_HostAddress}}/api/violations/business/760
+Accept: application/json
+
+### Sync manuelle
+POST {{RegistreAlimentaire.Api_HostAddress}}/api/sync
+Accept: application/json
+
+### Statut sync
+GET {{RegistreAlimentaire.Api_HostAddress}}/api/sync/status
+Accept: application/json

@@ -6,7 +6,7 @@ Ce document explique comment lancer le projet, utiliser l'interface web et conso
 
 ## Présentation
 
-**Registre alimentaire** (dépôt MontrealFoodViolations) est une application ASP.NET Core qui :
+**Registre alimentaire** est une application ASP.NET Core qui :
 
 - télécharge automatiquement le CSV officiel des infractions alimentaires de la Ville de Montréal ;
 - stocke les données dans une base **SQLite** ;
@@ -32,8 +32,8 @@ dotnet --version
 ## Exécution
 
 ```bash
-cd MontrealFoodViolations
-dotnet run --project src/MontrealFoodViolations.Api/MontrealFoodViolations.Api.csproj
+cd RegistreAlimentaire
+dotnet run --project src/RegistreAlimentaire.Api/RegistreAlimentaire.Api.csproj
 ```
 
 Interface locale : **http://localhost:5067**
@@ -72,11 +72,11 @@ En développement UI uniquement : lancer l'API, puis `npm run dev` dans `fronten
 
 ## Configuration
 
-Fichier : `src/MontrealFoodViolations.Api/appsettings.json`
+Fichier : `src/RegistreAlimentaire.Api/appsettings.json`
 
 | Paramètre | Description |
 |-----------|-------------|
-| `ConnectionStrings:DefaultConnection` | Chemin SQLite (`montrealfoodviolations.db`) |
+| `ConnectionStrings:DefaultConnection` | Chemin SQLite (`registrealimentaire.db`) |
 | `ViolationSync:Enabled` | Sync automatique activée/désactivée |
 | `ViolationSync:IntervalHours` | Intervalle entre syncs (défaut : 24 h) |
 | `MontrealDataset:ViolationsUrl` | URL du CSV officiel |
@@ -135,7 +135,7 @@ Base URL : `http://localhost:5067`
 ## Tests
 
 ```bash
-dotnet test MontrealFoodViolations.sln
+dotnet test RegistreAlimentaire.sln
 ```
 
 ---
@@ -143,12 +143,12 @@ dotnet test MontrealFoodViolations.sln
 ## Architecture
 
 ```
-frontend/                                 # Interface Vue 3 (Vite)
+frontend/                                # Interface Vue 3 (Vite)
 src/
-├── MontrealFoodViolations.Api/           # API REST + wwwroot (build Vue)
-├── MontrealFoodViolations.Application/   # Interfaces, modèles, options
-├── MontrealFoodViolations.Domain/        # Entités métier
-└── MontrealFoodViolations.Infrastructure/ # EF Core, sync, parsing CSV
+├── RegistreAlimentaire.Api/             # API REST + wwwroot (build Vue)
+├── RegistreAlimentaire.Application/     # Interfaces, modèles, options
+├── RegistreAlimentaire.Domain/          # Entités métier
+└── RegistreAlimentaire.Infrastructure/  # EF Core, sync, parsing CSV
 tests/
-└── MontrealFoodViolations.Tests/
+└── RegistreAlimentaire.Tests/
 ```

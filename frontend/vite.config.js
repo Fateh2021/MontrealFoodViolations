@@ -11,7 +11,7 @@ export default defineConfig({
     }
   },
   build: {
-    outDir: '../src/MontrealFoodViolations.Api/wwwroot',
+    outDir: '../src/RegistreAlimentaire.Api/wwwroot',
     emptyOutDir: true,
     assetsDir: 'assets'
   }
