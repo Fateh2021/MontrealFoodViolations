@@ -7,6 +7,7 @@ defineProps({
   finesByYear: { type: Array, default: () => [] },
   topCategoriesByFines: { type: Array, default: () => [] },
   finesByCity: { type: Array, default: () => [] },
+  scopeNote: { type: String, default: '' },
   yearNote: { type: String, default: '' }
 });
 </script>
@@ -14,6 +15,7 @@ defineProps({
 <template>
   <section class="stats-section" aria-label="Statistiques des amendes">
     <h2>Amendes imposées (condamnations)</h2>
+    <p v-if="scopeNote" class="stats-scope">{{ scopeNote }}</p>
     <div class="stats-kpi-grid">
       <div class="kpi-card">
         <span class="label">Montant total</span>

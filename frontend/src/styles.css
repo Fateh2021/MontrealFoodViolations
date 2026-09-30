@@ -161,6 +161,12 @@
       font-size: 1.05rem;
     }
 
+    .stats-scope {
+      margin: -6px 0 12px;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
     .stats-kpi-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
