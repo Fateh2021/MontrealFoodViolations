@@ -26,6 +26,18 @@ Thumbs.db
 ## Environment
 .env
 .env.*
+secrets.json
+**/appsettings.*.local.json
 
 ## Node
 node_modules/
+
+## Secrets and credentials
+*.PublishSettings
+*.publishsettings
+*.pfx
+*.p12
+*.snk
+*.pem
+*.key
+*.cer
