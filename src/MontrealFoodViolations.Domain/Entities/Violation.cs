@@ -15,6 +15,7 @@ public class Violation
     public string? Statut { get; set; }
     public DateOnly? DateStatut { get; set; }
     public string? Categorie { get; set; }
+    public string Source { get; set; } = "Montreal";
 
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
     public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;

@@ -34,6 +34,8 @@ public class MontrealFoodViolationsDbContext : DbContext
             entity.HasIndex(x => x.Statut);
             entity.HasIndex(x => x.Categorie);
             entity.HasIndex(x => x.Ville);
+            entity.Property(x => x.Source).HasMaxLength(40).IsRequired().HasDefaultValue("Montreal");
+            entity.HasIndex(x => x.Source);
         });
 
         modelBuilder.Entity<DatasetSyncState>(entity =>
