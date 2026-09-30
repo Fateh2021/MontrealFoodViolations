@@ -1,10 +1,22 @@
 <script setup>
+import { computed } from 'vue';
+
+const FEATURED_CITIES = ['Laval', 'Longueuil', 'Québec', 'Gatineau'];
+
 const filters = defineModel('filters', { type: Object, required: true });
 const pageSize = defineModel('pageSize', { type: Number, required: true });
 
-defineProps({
+const props = defineProps({
   cities: { type: Array, default: () => [] }
 });
+
+const featuredCities = computed(() =>
+  FEATURED_CITIES.filter(city => props.cities.includes(city))
+);
+
+const otherCities = computed(() =>
+  props.cities.filter(city => !FEATURED_CITIES.includes(city))
+);
 
 const emit = defineEmits(['search', 'export', 'reset']);
 
@@ -19,7 +31,12 @@ function onPageSizeChange(event) {
     <select v-model="filters.ville" aria-label="Ville" @change="emit('search')">
       <option value="Montréal">Montréal</option>
       <option value="Toutes">Toutes les villes</option>
-      <option v-for="city in cities" :key="city" :value="city">{{ city }}</option>
+      <optgroup v-if="featuredCities.length" label="Villes fréquentes">
+        <option v-for="city in featuredCities" :key="city" :value="city">{{ city }}</option>
+      </optgroup>
+      <optgroup v-if="otherCities.length" label="Autres villes">
+        <option v-for="city in otherCities" :key="city" :value="city">{{ city }}</option>
+      </optgroup>
     </select>
     <input
       v-model.trim="filters.search"

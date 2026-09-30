@@ -4,6 +4,7 @@ import BusinessModal from './components/BusinessModal.vue';
 import SearchFilters from './components/SearchFilters.vue';
 import StatsSection from './components/StatsSection.vue';
 import ViolationsTable from './components/ViolationsTable.vue';
+import { formatCategory } from './categories';
 import { formatCurrency, formatDate, formatNumber } from './formatters';
 
 const SOURCE_URL = 'https://data.montreal.ca/dataset/05a9e718-6810-4e73-8bb9-5955efeb91a0';
@@ -141,7 +142,7 @@ function applyFinesStats(stats) {
     value: formatCurrency(entry.totalAmount, true)
   }));
   topCategoriesByFines.value = (stats.topCategoriesByFines || []).map(entry => ({
-    label: `${entry.category || 'Sans catégorie'} (${formatNumber(entry.count)})`,
+    label: `${formatCategory(entry.category) || 'Sans catégorie'} (${formatNumber(entry.count)})`,
     value: formatCurrency(entry.totalAmount, true)
   }));
   finesByCity.value = (stats.finesByCity || []).map(entry => ({

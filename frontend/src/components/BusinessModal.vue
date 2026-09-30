@@ -1,12 +1,21 @@
 <script setup>
-import { formatCalendarDate, formatCurrency, formatNumber, statusClass } from '../formatters';
+import { computed } from 'vue';
+import { formatCategory } from '../categories';
+import { formatCalendarDate, formatCurrency, formatNumber, highestFine, statusClass, summarizeBusiness } from '../formatters';
 
-defineProps({
+const props = defineProps({
   open: { type: Boolean, default: false },
   loading: { type: Boolean, default: false },
   error: { type: String, default: '' },
   data: { type: Object, default: null }
 });
+
+const summary = computed(() => summarizeBusiness(props.data));
+const peakFine = computed(() => highestFine(props.data?.violations));
+
+function isPeakFine(violation) {
+  return peakFine.value != null && Number(violation.montant) === peakFine.value;
+}
 
 const emit = defineEmits(['close']);
 
@@ -33,6 +42,7 @@ function onBackdropClick(event) {
           <p v-if="!loading && !error && data" class="subtitle">
             {{ [data.adresse, data.ville].filter(Boolean).join(', ') }}
           </p>
+          <p v-if="!loading && !error && data" class="business-summary">{{ summary }}</p>
         </div>
         <button class="modal-close" type="button" @click="emit('close')">Fermer</button>
       </div>
@@ -67,8 +77,14 @@ function onBackdropClick(event) {
             </tr>
             <tr v-else v-for="violation in data.violations" :key="violation.idPoursuite ?? violation.description">
               <td>{{ formatCalendarDate(violation.date) }}</td>
-              <td>{{ violation.categorie ?? '' }}</td>
-              <td class="amount-cell">{{ violation.montant != null ? formatCurrency(violation.montant) : '—' }}</td>
+              <td>{{ formatCategory(violation.categorie) || '—' }}</td>
+              <td>
+                <span
+                  class="amount-cell"
+                  :class="{ 'amount-high': isPeakFine(violation) }"
+                  :title="isPeakFine(violation) ? 'Amende la plus élevée de cet établissement' : undefined"
+                >{{ violation.montant != null ? formatCurrency(violation.montant) : '—' }}</span>
+              </td>
               <td><span :class="statusClass(violation.statut)">{{ violation.statut || '—' }}</span></td>
               <td>{{ violation.description ?? '' }}</td>
             </tr>
