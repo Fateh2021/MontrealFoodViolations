@@ -1,6 +1,6 @@
 # Registre alimentaire
 
-**Registre alimentaire** est le nom du site. Le dépôt technique s'appelle MontrealFoodViolations. C'est une application full-stack .NET 10 : une API ASP.NET Core qui télécharge, analyse et synchronise les condamnations alimentaires de Montréal et du MAPAQ dans SQLite, plus une interface Vue 3 pour la recherche, les statistiques et les fiches établissement.
+**Registre alimentaire** est une application full-stack .NET 10 : une API ASP.NET Core qui télécharge, analyse et synchronise les condamnations alimentaires de Montréal et du MAPAQ dans SQLite, plus une interface Vue 3 pour la recherche, les statistiques et les fiches établissement.
 
 ## Objectif
 
@@ -61,14 +61,14 @@ L'identité unique d'un dossier est le champ `id_poursuite`. C'est la clé utili
 ## Architecture
 
 ```
-frontend/                                  # Interface Vue 3 (Vite, Composition API)
+frontend/                                # Interface Vue 3 (Vite, Composition API)
 src/
-├── MontrealFoodViolations.Api/            # API REST + wwwroot (build de production)
-├── MontrealFoodViolations.Application/    # contrats, modèles, options
-├── MontrealFoodViolations.Domain/         # entités
-└── MontrealFoodViolations.Infrastructure/ # EF Core, synchro CSV, client HTTP
+├── RegistreAlimentaire.Api/             # API REST + wwwroot (build de production)
+├── RegistreAlimentaire.Application/     # contrats, modèles, options
+├── RegistreAlimentaire.Domain/          # entités
+└── RegistreAlimentaire.Infrastructure/  # EF Core, synchro CSV, client HTTP
 tests/
-└── MontrealFoodViolations.Tests/
+└── RegistreAlimentaire.Tests/
 ```
 
 - API web ASP.NET Core
@@ -109,7 +109,7 @@ Les entités principales sont :
 Pour appliquer les migrations à la main (optionnel) :
 
 ```bash
-dotnet ef database update --project src/MontrealFoodViolations.Api/MontrealFoodViolations.Api.csproj
+dotnet ef database update --project src/RegistreAlimentaire.Api/RegistreAlimentaire.Api.csproj
 ```
 
 ## Endpoints de l'API
@@ -134,7 +134,7 @@ dotnet ef database update --project src/MontrealFoodViolations.Api/MontrealFoodV
 ## Exécution
 
 ```bash
-dotnet run --project src/MontrealFoodViolations.Api/MontrealFoodViolations.Api.csproj
+dotnet run --project src/RegistreAlimentaire.Api/RegistreAlimentaire.Api.csproj
 ```
 
 Ouvrir **http://localhost:5067**. Swagger est sur **`/swagger`**, en local comme sur le site déployé. ASP.NET sert le build Vue de production depuis `wwwroot`. Après une modification dans `frontend/` :
@@ -165,7 +165,7 @@ dotnet test
     "ViolationsUrl": "https://data.montreal.ca/dataset/05a9e718-6810-4e73-8bb9-5955efeb91a0/resource/7f939a08-be8a-45e1-b208-d8744dca8fc6/download/violations.csv"
   },
   "ConnectionStrings": {
-    "DefaultConnection": "Data Source=montrealfoodviolations.db"
+    "DefaultConnection": "Data Source=registrealimentaire.db"
   }
 }
 ```
