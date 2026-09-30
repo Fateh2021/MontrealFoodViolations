@@ -1,5 +1,5 @@
 <script setup>
-import { formatCurrency, formatNumber } from '../formatters';
+import { formatCalendarDate, formatCurrency, formatNumber, statusClass } from '../formatters';
 
 defineProps({
   open: { type: Boolean, default: false },
@@ -41,13 +41,14 @@ function onBackdropClick(event) {
         <div class="meta-item"><span>Infractions :</span><strong>{{ formatNumber(data.violationCount) }}</strong></div>
         <div class="meta-item"><span>Total amendes :</span><strong>{{ formatCurrency(data.totalFines, true) }}</strong></div>
         <div class="meta-item"><span>Propriétaire :</span><strong>{{ data.proprietaire || '—' }}</strong></div>
-        <div class="meta-item"><span>Statut :</span><strong>{{ data.statut || '—' }}</strong></div>
+        <div class="meta-item"><span>Statut :</span><strong><span :class="statusClass(data.statut)">{{ data.statut || '—' }}</span></strong></div>
       </div>
 
       <div class="modal-table-wrap">
         <table>
           <thead>
             <tr>
+              <th>Date</th>
               <th>Catégorie</th>
               <th>Montant</th>
               <th>Statut</th>
@@ -56,18 +57,19 @@ function onBackdropClick(event) {
           </thead>
           <tbody>
             <tr v-if="loading">
-              <td colspan="4" class="empty">Chargement...</td>
+              <td colspan="5" class="empty">Chargement...</td>
             </tr>
             <tr v-else-if="error">
-              <td colspan="4" class="empty">{{ error }}</td>
+              <td colspan="5" class="empty">{{ error }}</td>
             </tr>
             <tr v-else-if="!data?.violations?.length">
-              <td colspan="4" class="empty">Aucune infraction.</td>
+              <td colspan="5" class="empty">Aucune infraction.</td>
             </tr>
             <tr v-else v-for="violation in data.violations" :key="violation.idPoursuite ?? violation.description">
+              <td>{{ formatCalendarDate(violation.date) }}</td>
               <td>{{ violation.categorie ?? '' }}</td>
-              <td class="amount-cell">{{ violation.montant != null ? formatCurrency(violation.montant) : '' }}</td>
-              <td>{{ violation.statut ?? '' }}</td>
+              <td class="amount-cell">{{ violation.montant != null ? formatCurrency(violation.montant) : '—' }}</td>
+              <td><span :class="statusClass(violation.statut)">{{ violation.statut || '—' }}</span></td>
               <td>{{ violation.description ?? '' }}</td>
             </tr>
           </tbody>
