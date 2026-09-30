@@ -7,6 +7,7 @@ import ViolationsTable from './components/ViolationsTable.vue';
 import { formatCurrency, formatDate, formatNumber } from './formatters';
 
 const SOURCE_URL = 'https://data.montreal.ca/dataset/05a9e718-6810-4e73-8bb9-5955efeb91a0';
+const MAPAQ_URL = 'https://www.donneesquebec.ca/recherche/dataset/condamnations-des-etablissements-alimentaires-et-condamnations-concernant-le-bien-etre-des-anim';
 
 const filters = reactive({
   search: '',
@@ -15,8 +16,11 @@ const filters = reactive({
   categorie: '',
   statut: '',
   proprietaire: '',
-  description: ''
+  description: '',
+  ville: 'Montréal'
 });
+
+const cities = ref([]);
 
 const page = ref(1);
 const pageSize = ref(25);
@@ -48,8 +52,16 @@ const modalError = ref('');
 const businessData = ref(null);
 
 const hasFilters = computed(() =>
-  Object.values(filters).some(value => String(value).trim() !== '')
+  Object.entries(filters).some(([key, value]) => key !== 'ville' && String(value).trim() !== '')
 );
+
+const activeSource = computed(() => {
+  if (!filters.ville || filters.ville === 'Montréal') {
+    return { label: 'data.montreal.ca', url: SOURCE_URL };
+  }
+
+  return { label: 'MAPAQ', url: MAPAQ_URL };
+});
 
 const pageButtons = computed(() => {
   const maxButtons = 5;
@@ -112,8 +124,9 @@ function applyFinesStats(stats) {
 
 async function loadMeta() {
   try {
+    const ville = encodeURIComponent(filters.ville || 'Montréal');
     const [statsResponse, syncResponse] = await Promise.all([
-      fetch('/api/violations/stats'),
+      fetch(`/api/violations/stats?ville=${ville}`),
       fetch('/api/sync/status')
     ]);
 
@@ -190,9 +203,24 @@ async function search() {
   }
 }
 
+async function loadCities() {
+  try {
+    const response = await fetch('/api/violations/cities');
+    if (!response.ok) {
+      return;
+    }
+
+    const data = await response.json();
+    cities.value = (data.cities || []).filter(city => city && city !== 'Montréal');
+  } catch {
+    cities.value = [];
+  }
+}
+
 function onSearch() {
   page.value = 1;
   search();
+  loadMeta();
 }
 
 function exportCsv() {
@@ -207,11 +235,13 @@ function resetFilters() {
   filters.statut = '';
   filters.proprietaire = '';
   filters.description = '';
+  filters.ville = 'Montréal';
   pageSize.value = 25;
   page.value = 1;
   sortBy.value = 'Date';
   descending.value = true;
   search();
+  loadMeta();
 }
 
 function onSort(sortKey) {
@@ -267,6 +297,7 @@ function onKeydown(event) {
 onMounted(() => {
   document.addEventListener('keydown', onKeydown);
   loadMeta();
+  loadCities();
   search();
 });
 
@@ -282,9 +313,8 @@ onUnmounted(() => {
         <div>
           <h1>Montreal Food Violations</h1>
           <p class="subtitle">
-            Consultez les poursuites et infractions en matière de salubrité alimentaire
-            publiées par la Ville de Montréal. Recherchez un restaurant, une adresse,
-            un propriétaire ou une catégorie d'infraction.
+            Consultez les condamnations alimentaires de Montréal, puis choisissez une autre ville
+            pour voir celles publiées par le MAPAQ. Recherchez un restaurant ou une adresse.
           </p>
         </div>
         <span class="badge-pill">Données ouvertes</span>
@@ -305,7 +335,7 @@ onUnmounted(() => {
         </div>
         <div class="meta-item">
           <span>Source :</span>
-          <strong><a :href="SOURCE_URL" target="_blank" rel="noopener">data.montreal.ca</a></strong>
+          <strong><a :href="activeSource.url" target="_blank" rel="noopener">{{ activeSource.label }}</a></strong>
         </div>
       </div>
 
@@ -323,6 +353,7 @@ onUnmounted(() => {
         <div class="info-block">
           <h2>Comment chercher ?</h2>
           <ul>
+            <li>Choisissez une <strong>ville</strong>. Montréal inclut toute l'agglomération.</li>
             <li>Écrivez un <strong>nom ou une adresse</strong>, puis cliquez sur Rechercher.</li>
             <li>Ouvrez <strong>Recherche avancée</strong> pour filtrer le statut, la catégorie ou le propriétaire.</li>
             <li>Cliquez sur les en-têtes de colonnes pour <strong>trier</strong> les résultats.</li>
@@ -345,7 +376,7 @@ onUnmounted(() => {
           <h2>Mise à jour des données</h2>
           <p>
             Les données sont synchronisées automatiquement environ <strong>toutes les 24 heures</strong>
-            depuis le fichier officiel de la Ville de Montréal.
+            depuis la Ville de Montréal et la liste des condamnations du MAPAQ.
             Si aucun résultat n'apparaît au premier chargement, la synchronisation est peut-être encore en cours.
           </p>
         </div>
@@ -381,12 +412,13 @@ onUnmounted(() => {
         Ces informations proviennent de sources publiques officielles et sont présentées à titre indicatif uniquement.
         La présence d'une infraction ne signifie pas nécessairement que l'établissement est dangereux aujourd'hui —
         vérifiez toujours le <strong>statut</strong> et la <strong>date</strong> du dossier.
-        Ce site n'est pas affilié à la Ville de Montréal.
+        Ce site n'est pas affilié à la Ville de Montréal ni au MAPAQ. Les données du MAPAQ sont sous licence CC-BY 4.0.
       </div>
 
       <SearchFilters
         v-model:filters="filters"
         v-model:page-size="pageSize"
+        :cities="cities"
         @search="onSearch"
         @export="exportCsv"
         @reset="resetFilters"
@@ -421,7 +453,9 @@ onUnmounted(() => {
 
     <footer class="site-footer">
       Données publiques — source officielle :
-      <a :href="SOURCE_URL" target="_blank" rel="noopener">Ville de Montréal — Infractions alimentaires</a>
+      <a :href="SOURCE_URL" target="_blank" rel="noopener">Ville de Montréal</a>
+      et
+      <a :href="MAPAQ_URL" target="_blank" rel="noopener">MAPAQ</a>
     </footer>
   </div>
 
