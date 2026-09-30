@@ -58,7 +58,8 @@ En développement UI uniquement : lancer l'API, puis `npm run dev` dans `fronten
 
 ## Interface web
 
-- Le menu **Ville** envoie `ville`. `Montréal` limite aux dossiers de la Ville, y compris les arrondissements. Une autre valeur, par exemple `Laval`, ne garde que cette municipalité. `Toutes` retire le filtre.
+- Le résumé des amendes, dont les totaux par année, compte toutes les villes. Le menu **Ville** envoie `ville` seulement à la liste et à l'export. `Montréal` limite à l'agglomération. Une autre valeur, par exemple `Laval`, ne garde que cette municipalité. `Toutes` retire le filtre de la liste.
+- Les années antérieures à 2024 ne viennent que de Montréal. Le fichier du MAPAQ couvre les 24 derniers mois.
 - La recherche commence par un champ **Nom ou adresse**. Il envoie le paramètre `search`. Les filtres établissement, adresse, catégorie, statut, propriétaire et description sont sous **Recherche avancée**.
 - Les colonnes visibles commencent par l'établissement, l'adresse, la date, la date de jugement, le montant et le statut. Les dates du calendrier sont en français.
 - Le tri initial est `Date` décroissant.

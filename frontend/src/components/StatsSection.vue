@@ -6,7 +6,8 @@ defineProps({
   maxFine: { type: String, required: true },
   finesByYear: { type: Array, default: () => [] },
   topCategoriesByFines: { type: Array, default: () => [] },
-  finesByCity: { type: Array, default: () => [] }
+  finesByCity: { type: Array, default: () => [] },
+  yearNote: { type: String, default: '' }
 });
 </script>
 
@@ -38,6 +39,7 @@ defineProps({
     <div class="stats-panels">
       <div class="stats-panel">
         <h3>Amendes par année (date du jugement)</h3>
+        <p v-if="yearNote" class="stats-note">{{ yearNote }}</p>
         <ul class="stats-list">
           <li v-if="!finesByYear.length">Aucune donnée disponible.</li>
           <li v-for="item in finesByYear" :key="item.label">

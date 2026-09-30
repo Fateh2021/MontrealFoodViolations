@@ -215,6 +215,12 @@
       font-size: 0.95rem;
     }
 
+    .stats-note {
+      margin: -4px 0 10px;
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
     .stats-list {
       list-style: none;
       margin: 0;

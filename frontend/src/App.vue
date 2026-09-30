@@ -17,7 +17,7 @@ const filters = reactive({
   statut: '',
   proprietaire: '',
   description: '',
-  ville: 'Montréal'
+  ville: 'Toutes'
 });
 
 const cities = ref([]);
@@ -70,6 +70,8 @@ const activeSource = computed(() => {
 
   return { label: 'MAPAQ', url: MAPAQ_URL };
 });
+
+const yearNote = "Depuis 2024, ces totaux comptent toutes les villes. Avant, seule Montréal est disponible : le MAPAQ ne publie que les 24 derniers mois.";
 
 const pageButtons = computed(() => {
   const maxButtons = 5;
@@ -132,9 +134,8 @@ function applyFinesStats(stats) {
 
 async function loadMeta() {
   try {
-    const ville = encodeURIComponent(filters.ville || 'Montréal');
     const [statsResponse, syncResponse] = await Promise.all([
-      fetch(`/api/violations/stats?ville=${ville}`),
+      fetch('/api/violations/stats?ville=Toutes'),
       fetch('/api/sync/status')
     ]);
 
@@ -243,7 +244,7 @@ function resetFilters() {
   filters.statut = '';
   filters.proprietaire = '';
   filters.description = '';
-  filters.ville = 'Montréal';
+  filters.ville = 'Toutes';
   pageSize.value = 25;
   page.value = 1;
   sortBy.value = 'Date';
@@ -321,8 +322,8 @@ onUnmounted(() => {
         <div>
           <h1>Montreal Food Violations</h1>
           <p class="subtitle">
-            Consultez les condamnations alimentaires de Montréal, puis choisissez une autre ville
-            pour voir celles publiées par le MAPAQ. Recherchez un restaurant ou une adresse.
+            Consultez les condamnations alimentaires de Montréal et du reste du Québec.
+            Choisissez une ville pour limiter la liste. Recherchez un restaurant ou une adresse.
           </p>
         </div>
         <div class="topbar-actions">
@@ -371,13 +372,15 @@ onUnmounted(() => {
         :fines-by-year="finesByYear"
         :top-categories-by-fines="topCategoriesByFines"
         :fines-by-city="finesByCity"
+        :year-note="yearNote"
       />
 
       <div class="info-grid">
         <div class="info-block">
           <h2>Comment chercher ?</h2>
           <ul>
-            <li>Choisissez une <strong>ville</strong>. Montréal inclut toute l'agglomération.</li>
+            <li>Le résumé des amendes couvre <strong>toutes les villes</strong>. Le menu Ville filtre seulement la liste.</li>
+            <li>Choisissez <strong>Montréal</strong> pour limiter la liste à l'agglomération.</li>
             <li>Écrivez un <strong>nom ou une adresse</strong>, puis cliquez sur Rechercher.</li>
             <li>Ouvrez <strong>Recherche avancée</strong> pour filtrer le statut, la catégorie ou le propriétaire.</li>
             <li>Cliquez sur les en-têtes de colonnes pour <strong>trier</strong> les résultats.</li>
