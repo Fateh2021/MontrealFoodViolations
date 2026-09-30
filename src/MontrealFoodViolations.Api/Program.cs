@@ -31,7 +31,7 @@ builder.Services.AddOpenApi(options =>
     {
         document.Info.Title = "Montreal Food Violations";
         document.Info.Version = "v1";
-        document.Info.Description = "API des infractions alimentaires de la Ville de Montréal.";
+        document.Info.Description = "API des condamnations alimentaires de Montréal et du reste du Québec.";
         return Task.CompletedTask;
     });
 });
