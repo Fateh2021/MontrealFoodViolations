@@ -54,7 +54,7 @@ tests/
 - EF Core + SQLite
 - BackgroundService pour la synchro planifiée
 - HttpClient via IHttpClientFactory
-- OpenAPI + Swagger UI (développement, `/swagger`)
+- OpenAPI + Swagger UI (`/swagger`)
 - Tests xUnit
 - Injection de dépendances et journalisation
 
@@ -114,7 +114,7 @@ dotnet ef database update --project src/MontrealFoodViolations.Api/MontrealFoodV
 dotnet run --project src/MontrealFoodViolations.Api/MontrealFoodViolations.Api.csproj
 ```
 
-Ouvrir **http://localhost:5067**. Swagger (développement seulement) est sur **http://localhost:5067/swagger**. ASP.NET sert le build Vue de production depuis `wwwroot`. Après une modification dans `frontend/` :
+Ouvrir **http://localhost:5067**. Swagger est sur **`/swagger`**, en local comme sur le site déployé. ASP.NET sert le build Vue de production depuis `wwwroot`. Après une modification dans `frontend/` :
 
 ```bash
 cd frontend

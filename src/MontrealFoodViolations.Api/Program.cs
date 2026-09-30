@@ -44,14 +44,11 @@ using (var scope = app.Services.CreateScope())
     db.Database.Migrate();
 }
 
-if (app.Environment.IsDevelopment())
+app.MapOpenApi();
+app.UseSwaggerUI(options =>
 {
-    app.MapOpenApi();
-    app.UseSwaggerUI(options =>
-    {
-        options.SwaggerEndpoint("/openapi/v1.json", "Montreal Food Violations v1");
-    });
-}
+    options.SwaggerEndpoint("/openapi/v1.json", "Montreal Food Violations v1");
+});
 
 app.UseDefaultFiles();
 app.UseStaticFiles();

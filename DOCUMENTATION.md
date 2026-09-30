@@ -38,7 +38,7 @@ dotnet run --project src/MontrealFoodViolations.Api/MontrealFoodViolations.Api.c
 
 Interface web : **http://localhost:5067**
 
-Swagger (développement) : **http://localhost:5067/swagger**
+Swagger : **`/swagger`** (local et production)
 
 Au démarrage, les migrations EF Core sont appliquées automatiquement et une synchronisation des données est lancée en arrière-plan.
 
